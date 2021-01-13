@@ -6,6 +6,7 @@ export default function App() {
   return (
     <View style={styles.container}>
       <Text>Wandrer (proto)</Text>
+      <Text style={styles.subtitle}>made using Freesound</Text>
       <StatusBar style="auto" />
     </View>
   );
@@ -17,5 +18,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'khaki',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  subtitle: {
+    color: 'teal',
   },
 });
