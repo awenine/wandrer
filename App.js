@@ -6,7 +6,7 @@ import * as Location from 'expo-location';
 import { Audio } from 'expo-av';
 
 export default function App() {
-  const [sound, setSound] = useState();
+  const [sound, setSound] = useState(null);
   const [location, setLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
   const [soundLoadMsg, setSoundLoadMsg] = useState('Waiting to play...');
@@ -23,6 +23,12 @@ export default function App() {
 
     setSoundLoadMsg('Playing Sound');
     await sound.playAsync();
+  }
+
+  function stopSound() {
+    if (sound) {
+      sound.stopAsync();
+    }
   }
 
   useEffect(() => {
@@ -71,7 +77,9 @@ export default function App() {
       <Text style={styles.subtitle}>made using Freesound</Text>
       <Text>{locationText}</Text>
       <Text style={styles.soundload}>{soundLoadMsg}</Text>
-      <Button title="Play stored sound" onPress={playSound} />
+      <Button color="darkseagreen" title="Play" onPress={playSound} />
+      <Text>::::::</Text>
+      <Button color="maroon" title="Stop" onPress={stopSound} />
       <StatusBar style="auto" />
     </View>
   );
@@ -80,7 +88,7 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'khaki',
+    backgroundColor: 'darkkhaki',
     alignItems: 'center',
     justifyContent: 'center',
   },
