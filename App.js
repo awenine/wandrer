@@ -7,6 +7,7 @@ export default function App() {
     <View style={styles.container}>
       <Text>Wandrer (proto)</Text>
       <Text style={styles.subtitle}>made using Freesound</Text>
+      <Text>CHANGE</Text>
       <StatusBar style="auto" />
     </View>
   );
