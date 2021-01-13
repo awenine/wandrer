@@ -14,7 +14,10 @@ export default function App() {
   async function playSound() {
     setSoundLoadMsg('Loading Sound');
     const { sound } = await Audio.Sound.createAsync(
-      require('./assets/FFX_arp_sound.mp3'),
+      //* for playing sound files stored in assets
+      // require('./assets/FFX_arp_sound.mp3'),
+      //* for playing sounds from URL (below route returned by freesound api > 'previews')
+      { uri: 'https://freesound.org/data/previews/401/401145_1821057-lq.mp3' },
     );
     setSound(sound);
 
