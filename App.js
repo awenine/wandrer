@@ -1,13 +1,37 @@
 import { StatusBar } from 'expo-status-bar';
-import { Platform, StyleSheet, Text, View } from 'react-native';
+import { Platform, StyleSheet, Text, View, Button } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import Constants from 'expo-constants';
 import * as Location from 'expo-location';
+import { Audio } from 'expo-av';
 
 export default function App() {
+  const [sound, setSound] = useState();
   const [location, setLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
+  const [soundLoadMsg, setSoundLoadMsg] = useState('Waiting to play...');
 
+  async function playSound() {
+    setSoundLoadMsg('Loading Sound');
+    const { sound } = await Audio.Sound.createAsync(
+      require('./assets/FFX_arp_sound.mp3'),
+    );
+    setSound(sound);
+
+    setSoundLoadMsg('Playing Sound');
+    await sound.playAsync();
+  }
+
+  useEffect(() => {
+    return sound
+      ? () => {
+          setSoundLoadMsg('Unloading Sound');
+          sound.unloadAsync();
+        }
+      : undefined;
+  }, [sound]);
+
+  //? Location settup
   useEffect(() => {
     (async () => {
       //* check whether app is running on phone or emulator
@@ -27,14 +51,15 @@ export default function App() {
       let location = await Location.getLastKnownPositionAsync({});
       setLocation(location);
     })();
-  }, []);
+  }, [sound]);
 
+  //? Update location text
   let locationText = 'Fetching location...';
   if (errorMsg) {
     locationText = errorMsg;
   } else if (location) {
     let { longitude, latitude } = location.coords;
-    locationText = 'You are at ' + longitude + ',' + latitude;
+    locationText = 'You are at ' + latitude + ', ' + longitude;
   }
 
   return (
@@ -42,6 +67,8 @@ export default function App() {
       <Text>Wandrer (proto)</Text>
       <Text style={styles.subtitle}>made using Freesound</Text>
       <Text>{locationText}</Text>
+      <Text style={styles.soundload}>{soundLoadMsg}</Text>
+      <Button title="Play stored sound" onPress={playSound} />
       <StatusBar style="auto" />
     </View>
   );
@@ -56,5 +83,9 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     color: 'teal',
+  },
+  soundload: {
+    color: 'tomato',
+    marginBottom: 10,
   },
 });
