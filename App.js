@@ -19,6 +19,10 @@ export default function App() {
   const [location, setLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
   const [soundLoadMsg, setSoundLoadMsg] = useState('Waiting to play...');
+  const [markerCoord, setMarkerCoord] = useState({
+    latitude: 37.78825,
+    longitude: -122.4324,
+  });
 
   //todo check playing in background, lock screen/menu notifications
   async function playSound() {
@@ -118,12 +122,19 @@ export default function App() {
         // showsUserLocation-true // NOTE - fails silently, other dependencies
       >
         <Marker
+          draggable
           coordinate={{
-            latitude: 37.78825,
-            longitude: -122.4324,
+            // replace with dynamic values
+            latitude: markerCoord.latitude,
+            longitude: markerCoord.longitude,
           }}
+          onDragEnd={(e) => setMarkerCoord(e.nativeEvent.coordinate)}
         />
       </MapView>
+      {/* Get and print coordinates of marker when moved */}
+      <Text>
+        Marker at: {markerCoord.latitude}, {markerCoord.longitude}
+      </Text>
       <StatusBar style="auto" />
     </View>
   );
@@ -149,5 +160,6 @@ const styles = StyleSheet.create({
   map: {
     width: Dimensions.get('window').width * 0.85,
     height: Dimensions.get('window').height * 0.5,
+    marginBottom: 10,
   },
 });
