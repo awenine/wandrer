@@ -97,11 +97,23 @@ export default function App() {
       <Text style={styles.subtitle}>made using Freesound</Text>
       <Text>{locationText}</Text>
       <Text style={styles.soundload}>{soundLoadMsg}</Text>
-      <Button color="darkseagreen" title="Play" onPress={playSound} />
-      <Text>::::::</Text>
-      <Button color="maroon" title="Stop" onPress={stopSound} />
-      <Text>~~~~~~~</Text>
-      <MapView style={styles.map} />
+      <View style={styles.buttons}>
+        <Button color="darkseagreen" title="Play" onPress={playSound} />
+        <Text>{'         '}</Text>
+        <Button color="maroon" title="Stop" onPress={stopSound} />
+      </View>
+      <Text>{'        '}</Text>
+      <Text>{'         '}</Text>
+      <MapView
+        style={styles.map}
+        initialRegion={{
+          latitude: 37.78825,
+          longitude: -122.4324,
+          // these delta values are used to avoid stretching the map, only the largest one is used
+          latitudeDelta: 0.0422,
+          longitudeDelta: 0.0922,
+        }}
+      />
       <StatusBar style="auto" />
     </View>
   );
@@ -121,8 +133,11 @@ const styles = StyleSheet.create({
     color: 'tomato',
     marginBottom: 10,
   },
+  buttons: {
+    flexDirection: 'row',
+  },
   map: {
     width: Dimensions.get('window').width * 0.85,
-    height: Dimensions.get('window').height * 0.4,
+    height: Dimensions.get('window').height * 0.5,
   },
 });
