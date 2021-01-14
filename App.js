@@ -11,27 +11,36 @@ export default function App() {
   const [errorMsg, setErrorMsg] = useState(null);
   const [soundLoadMsg, setSoundLoadMsg] = useState('Waiting to play...');
 
+  //todo check playing in background, lock screen/menu notifications
   async function playSound() {
     setSoundLoadMsg('Loading Sound');
     const { sound } = await Audio.Sound.createAsync(
       //* for playing sound files stored in assets
       // require('./assets/FFX_arp_sound.mp3'),
       //* for playing sounds from URL (below route returned by freesound api > 'previews')
+      //todo make dynamic based on API requests using fetched location
       { uri: 'https://freesound.org/data/previews/401/401145_1821057-lq.mp3' },
     );
     setSound(sound);
 
-    setSoundLoadMsg('Playing Sound');
     await sound.playAsync();
+    setSoundLoadMsg('Playing Sound');
   }
 
   function stopSound() {
     if (sound) {
       sound.stopAsync();
+      //! not sure if necessary, related to unloading
+      setSound(null);
     }
   }
 
+  //todo look at when unloading comes into effect
   useEffect(() => {
+    //* sets audio to continue playing when app is in background
+    Audio.setAudioModeAsync({
+      staysActiveInBackground: true,
+    });
     return sound
       ? () => {
           setSoundLoadMsg('Unloading Sound');
@@ -40,6 +49,7 @@ export default function App() {
       : undefined;
   }, [sound]);
 
+  //todo seperate into components
   //? Location settup
   useEffect(() => {
     (async () => {
@@ -63,6 +73,7 @@ export default function App() {
   }, [sound]);
 
   //? Update location text
+  //todo look at updating map displays
   let locationText = 'Fetching location...';
   if (errorMsg) {
     locationText = errorMsg;
@@ -71,6 +82,7 @@ export default function App() {
     locationText = 'You are at ' + latitude + ', ' + longitude;
   }
 
+  //todo set up navigation
   return (
     <View style={styles.container}>
       <Text>Wandrer (proto)</Text>
