@@ -1,9 +1,17 @@
 import { StatusBar } from 'expo-status-bar';
-import { Platform, StyleSheet, Text, View, Button } from 'react-native';
+import {
+  Platform,
+  StyleSheet,
+  Text,
+  View,
+  Button,
+  Dimensions,
+} from 'react-native';
 import React, { useEffect, useState } from 'react';
 import Constants from 'expo-constants';
 import * as Location from 'expo-location';
 import { Audio } from 'expo-av';
+import MapView from 'react-native-maps';
 
 export default function App() {
   const [sound, setSound] = useState(null);
@@ -92,6 +100,8 @@ export default function App() {
       <Button color="darkseagreen" title="Play" onPress={playSound} />
       <Text>::::::</Text>
       <Button color="maroon" title="Stop" onPress={stopSound} />
+      <Text>~~~~~~~</Text>
+      <MapView style={styles.map} />
       <StatusBar style="auto" />
     </View>
   );
@@ -110,5 +120,9 @@ const styles = StyleSheet.create({
   soundload: {
     color: 'tomato',
     marginBottom: 10,
+  },
+  map: {
+    width: Dimensions.get('window').width * 0.85,
+    height: Dimensions.get('window').height * 0.4,
   },
 });

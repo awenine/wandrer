@@ -18,7 +18,8 @@
     "expo-location": "~10.0.0",
     "expo-constants": "~9.3.3",
     "expo-av": "~8.7.0",
-    "expo-asset": "~8.2.1"
+    "expo-asset": "~8.2.1",
+    "react-native-maps": "0.27.1"
   },
   "devDependencies": {
     "@babel/core": "~7.9.0",
