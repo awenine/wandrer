@@ -7,11 +7,11 @@ import {
   Button,
   Dimensions,
 } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Constants from 'expo-constants';
 import * as Location from 'expo-location';
 import { Audio } from 'expo-av';
-import MapView, { Marker, Polyline } from 'react-native-maps';
+import MapView, { MapViewAnimated, Marker, Polyline } from 'react-native-maps';
 import mapStyle from './mapstyle';
 
 export default function App() {
@@ -24,6 +24,9 @@ export default function App() {
     longitude: -122.4324,
   });
   const [mapTrail, setMapTrail] = useState([markerCoord]);
+
+  //? used to access methods on the MapView component (for animation)
+  const mapView = useRef(null);
 
   //todo check playing in background, lock screen/menu notifications
   async function playSound() {
@@ -103,6 +106,18 @@ export default function App() {
     setMapTrail([...mapTrail, newCoords]);
   }
 
+  function mapAnimateNavigation() {
+    mapView.current.animateToRegion(
+      {
+        latitude: 36.28825,
+        longitude: -122.9324,
+        latitudeDelta: 0.0422,
+        longitudeDelta: 0.0922,
+      },
+      2000,
+    );
+  }
+
   //todo set up navigation
   return (
     <View style={styles.container}>
@@ -114,10 +129,24 @@ export default function App() {
         <Button color="darkseagreen" title="Play" onPress={playSound} />
         <Text>{'         '}</Text>
         <Button color="maroon" title="Stop" onPress={stopSound} />
+        <Text>{'         '}</Text>
+        <Button
+          id="horaldo"
+          color="blue"
+          title="Move Map"
+          //  jumps map refion and marker to this location
+          // onPress={() => setMarkerCoord({
+          //     latitude: 38.78825,
+          //     longitude: -121.4324,
+          //   })
+          // }
+          onPress={mapAnimateNavigation}
+        />
       </View>
       <Text>{'        '}</Text>
       <Text>{'         '}</Text>
       <MapView
+        ref={mapView}
         style={styles.map}
         initialRegion={{
           latitude: 37.78825,
@@ -126,13 +155,17 @@ export default function App() {
           latitudeDelta: 0.0422,
           longitudeDelta: 0.0922,
         }}
+        region={{
+          ...markerCoord,
+          latitudeDelta: 0.0422,
+          longitudeDelta: 0.0322,
+        }}
         customMapStyle={mapStyle}
         // showsUserLocation-true // NOTE - fails silently, other dependencies
       >
         <Marker
           draggable
           coordinate={{
-            // replace with dynamic values
             latitude: markerCoord.latitude,
             longitude: markerCoord.longitude,
           }}
