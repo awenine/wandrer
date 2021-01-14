@@ -11,7 +11,7 @@ import React, { useEffect, useState } from 'react';
 import Constants from 'expo-constants';
 import * as Location from 'expo-location';
 import { Audio } from 'expo-av';
-import MapView from 'react-native-maps';
+import MapView, { Marker } from 'react-native-maps';
 import mapStyle from './mapstyle';
 
 export default function App() {
@@ -115,7 +115,15 @@ export default function App() {
           longitudeDelta: 0.0922,
         }}
         customMapStyle={mapStyle}
-      />
+        // showsUserLocation-true // NOTE - fails silently, other dependencies
+      >
+        <Marker
+          coordinate={{
+            latitude: 37.78825,
+            longitude: -122.4324,
+          }}
+        />
+      </MapView>
       <StatusBar style="auto" />
     </View>
   );
