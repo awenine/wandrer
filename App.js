@@ -27,15 +27,19 @@ export default function App() {
   const [mapTrail, setMapTrail] = useState([markerCoord]);
   //? For storing fetched data
   const [postsFromAPI, setPostsFromAPI] = useState([]);
+  //? Random number to grab specific post from postsFromAPI
+  const [randNum, setRandNum] = useState(0);
 
   //? fetch data from mock api
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleFetchPosts = useCallback(async () => {
+    console.log('handling...');
     const result = await fetch('https://jsonplaceholder.typicode.com/posts');
     const posts = await result.json();
     if (result.ok) {
       setPostsFromAPI(posts);
     }
+    setRandNum(Math.floor(Math.random() * postsFromAPI.length));
   });
 
   //? used to access methods on the MapView component (for animation)
@@ -133,11 +137,11 @@ export default function App() {
 
   //? used to conditionally render items from fetched array
   //todo replace with sounds from Freesound API
-  function renderOnePost({ item, index }) {
-    if (index === 1) {
+  function renderOnePost({ item, index }, number) {
+    if (index === number) {
       return (
         <View>
-          <Text>{item.id}</Text>
+          <Text>{item.body}</Text>
           <Text></Text>
         </View>
       );
@@ -210,7 +214,9 @@ export default function App() {
       <FlatList
         data={postsFromAPI}
         keyExtractor={(item) => item.id + ''} // NOTE: id expects string
-        renderItem={renderOnePost}
+        renderItem={({ item, index }) =>
+          renderOnePost({ item, index }, randNum)
+        }
       />
       <StatusBar style="auto" />
     </View>
