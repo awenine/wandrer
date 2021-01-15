@@ -134,10 +134,10 @@ export default function App() {
   //? used to conditionally render items from fetched array
   //todo replace with sounds from Freesound API
   function renderOnePost({ item, index }) {
-    if (index % 5 === 1) {
+    if (index === 1) {
       return (
         <View>
-          <Text>{item.body}</Text>
+          <Text>{item.id}</Text>
           <Text></Text>
         </View>
       );
@@ -209,7 +209,7 @@ export default function App() {
       </Text>
       <FlatList
         data={postsFromAPI}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.id + ''} // NOTE: id expects string
         renderItem={renderOnePost}
       />
       <StatusBar style="auto" />
