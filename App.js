@@ -13,8 +13,9 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Constants from 'expo-constants';
 import * as Location from 'expo-location';
 import { Audio } from 'expo-av';
+import MapView, { Marker, Polyline } from 'react-native-maps';
+import mapStyle from './mapstyle';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Map from './components/Map';
 
 export default function App() {
   const [sound, setSound] = useState(null);
@@ -210,7 +211,34 @@ export default function App() {
       </View>
       <Text>{''}</Text>
       <Text>{''}</Text>
-      <Map />
+      <MapView
+        ref={mapView}
+        style={styles.map}
+        initialRegion={{
+          latitude: 37.78825,
+          longitude: -122.4324,
+          // these delta values are used to avoid stretching the map, only the largest one is used
+          latitudeDelta: 0.0422,
+          longitudeDelta: 0.0922,
+        }}
+        region={{
+          ...markerCoord,
+          latitudeDelta: 0.0422,
+          longitudeDelta: 0.0322,
+        }}
+        customMapStyle={mapStyle}
+        // showsUserLocation-true // NOTE - fails silently, other dependencies
+      >
+        <Marker
+          draggable
+          coordinate={{
+            latitude: markerCoord.latitude,
+            longitude: markerCoord.longitude,
+          }}
+          onDragEnd={handleMarkerDrag}
+        />
+        <Polyline coordinates={mapTrail} />
+      </MapView>
       {/* Get and print coordinates of marker when moved */}
       <Text>
         Marker at: {markerCoord.latitude}, {markerCoord.longitude}
