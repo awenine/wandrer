@@ -7,6 +7,7 @@ import {
   Button,
   Dimensions,
   FlatList,
+  TextInput,
 } from 'react-native';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Constants from 'expo-constants';
@@ -14,6 +15,7 @@ import * as Location from 'expo-location';
 import { Audio } from 'expo-av';
 import MapView, { Marker, Polyline } from 'react-native-maps';
 import mapStyle from './mapstyle';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function App() {
   const [sound, setSound] = useState(null);
@@ -29,6 +31,8 @@ export default function App() {
   const [postsFromAPI, setPostsFromAPI] = useState([]);
   //? Random number to grab specific post from postsFromAPI
   const [randNum, setRandNum] = useState(0);
+  //? Quote to store locally
+  const [quote, setQuote] = useState();
 
   //? fetch data from mock api
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -141,7 +145,7 @@ export default function App() {
     if (index === number) {
       return (
         <View>
-          <Text>{item.body}</Text>
+          <Text>{item.title}</Text>
           <Text></Text>
         </View>
       );
@@ -149,6 +153,34 @@ export default function App() {
       return;
     }
   }
+
+  //? use to save quotes to storage
+  async function saveToStorage() {
+    console.log(quote);
+    try {
+      await AsyncStorage.setItem('quote', quote);
+    } catch (error) {
+      // eslint-disable-next-line no-alert
+      alert(error);
+    }
+  }
+
+  //? Load from localstorage on startup
+  async function loadFromStorage() {
+    try {
+      let savedQuote = await AsyncStorage.getItem('quote');
+      if (savedQuote) {
+        setQuote(savedQuote);
+      }
+    } catch (error) {
+      // eslint-disable-next-line no-alert
+      alert(error);
+    }
+  }
+
+  useEffect(() => {
+    loadFromStorage();
+  }, []);
 
   //todo set up navigation
   return (
@@ -212,12 +244,17 @@ export default function App() {
         Marker at: {markerCoord.latitude}, {markerCoord.longitude}
       </Text>
       <FlatList
+        style={styles.flatlist}
         data={postsFromAPI}
         keyExtractor={(item) => item.id + ''} // NOTE: id expects string
         renderItem={({ item, index }) =>
           renderOnePost({ item, index }, randNum)
         }
       />
+      {/* For testing local storage (for favourites) */}
+      <TextInput style={styles.input} onChangeText={(text) => setQuote(text)} />
+      <Button color="teal" title="Save this quote" onPress={saveToStorage} />
+      <Text>Quote: {quote}</Text>
       <StatusBar style="auto" />
     </View>
   );
@@ -242,7 +279,18 @@ const styles = StyleSheet.create({
   },
   map: {
     width: Dimensions.get('window').width * 0.85,
-    height: Dimensions.get('window').height * 0.5,
+    height: Dimensions.get('window').height * 0.2,
     marginBottom: 10,
+  },
+  flatlist: {
+    height: Dimensions.get('window').height * 0.2,
+    marginVertical: 5,
+  },
+  input: {
+    alignSelf: 'stretch',
+    height: 50,
+    fontSize: 24,
+    backgroundColor: 'antiquewhite',
+    marginVertical: 5,
   },
 });
