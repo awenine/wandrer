@@ -8,6 +8,7 @@ import {
   Dimensions,
   FlatList,
   TextInput,
+  ScrollView,
 } from 'react-native';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Constants from 'expo-constants';
@@ -185,32 +186,6 @@ export default function App() {
   //todo set up navigation
   return (
     <View style={styles.container}>
-      <Text>Wandrer (proto)</Text>
-      <Text style={styles.subtitle}>made using Freesound</Text>
-      <Text>{locationText}</Text>
-      <Text style={styles.soundload}>{soundLoadMsg}</Text>
-      <View style={styles.buttons}>
-        <Button color="darkseagreen" title="Play" onPress={playSound} />
-        <Text>{'         '}</Text>
-        <Button color="maroon" title="Stop" onPress={stopSound} />
-        <Text>{'         '}</Text>
-        <Button
-          id="horaldo"
-          color="blue"
-          title="Move Map"
-          //  jumps map refion and marker to this location
-          // onPress={() => setMarkerCoord({
-          //     latitude: 38.78825,
-          //     longitude: -121.4324,
-          //   })
-          // }
-          onPress={mapAnimateNavigation}
-        />
-        <Text>{'         '}</Text>
-        <Button title="API" color="peru" onPress={handleFetchPosts} />
-      </View>
-      <Text>{''}</Text>
-      <Text>{''}</Text>
       <MapView
         ref={mapView}
         style={styles.map}
@@ -239,23 +214,54 @@ export default function App() {
         />
         <Polyline coordinates={mapTrail} />
       </MapView>
-      {/* Get and print coordinates of marker when moved */}
-      <Text>
-        Marker at: {markerCoord.latitude}, {markerCoord.longitude}
-      </Text>
-      <FlatList
-        style={styles.flatlist}
-        data={postsFromAPI}
-        keyExtractor={(item) => item.id + ''} // NOTE: id expects string
-        renderItem={({ item, index }) =>
-          renderOnePost({ item, index }, randNum)
-        }
-      />
-      {/* For testing local storage (for favourites) */}
-      <TextInput style={styles.input} onChangeText={(text) => setQuote(text)} />
-      <Button color="teal" title="Save this quote" onPress={saveToStorage} />
-      <Text>Quote: {quote}</Text>
-      <StatusBar style="auto" />
+      <ScrollView>
+        <Text>Wandrer (proto)</Text>
+        <Text style={styles.subtitle}>made using Freesound</Text>
+        <Text>{locationText}</Text>
+        <Text style={styles.soundload}>{soundLoadMsg}</Text>
+        <View style={styles.buttons}>
+          <Button color="darkseagreen" title="Play" onPress={playSound} />
+          <Text>{'         '}</Text>
+          <Button color="maroon" title="Stop" onPress={stopSound} />
+          <Text>{'         '}</Text>
+          <Button
+            id="horaldo"
+            color="blue"
+            title="Move Map"
+            //  jumps map refion and marker to this location
+            // onPress={() => setMarkerCoord({
+            //     latitude: 38.78825,
+            //     longitude: -121.4324,
+            //   })
+            // }
+            onPress={mapAnimateNavigation}
+          />
+          <Text>{'         '}</Text>
+          <Button title="API" color="peru" onPress={handleFetchPosts} />
+        </View>
+        <Text>{''}</Text>
+        <Text>{''}</Text>
+        {/* Get and print coordinates of marker when moved */}
+        <Text>
+          Marker at: {markerCoord.latitude}, {markerCoord.longitude}
+        </Text>
+        <FlatList
+          style={styles.flatlist}
+          data={postsFromAPI}
+          keyExtractor={(item) => item.id + ''} // NOTE: id expects string
+          renderItem={({ item, index }) =>
+            renderOnePost({ item, index }, randNum)
+          }
+        />
+        {/* For testing local storage (for favourites) */}
+        <TextInput
+          style={styles.input}
+          onChangeText={(text) => setQuote(text)}
+        />
+        <Button color="teal" title="Save this quote" onPress={saveToStorage} />
+        <Text>Quote: {quote}</Text>
+        <StatusBar style="auto" />
+      </ScrollView>
     </View>
   );
 }
@@ -278,8 +284,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   map: {
-    width: Dimensions.get('window').width * 0.85,
-    height: Dimensions.get('window').height * 0.2,
+    width: Dimensions.get('window').width,
+    height: Dimensions.get('window').height * 0.7,
     marginBottom: 10,
   },
   flatlist: {
