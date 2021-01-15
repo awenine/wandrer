@@ -6,12 +6,13 @@ import {
   View,
   Button,
   Dimensions,
+  FlatList,
 } from 'react-native';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Constants from 'expo-constants';
 import * as Location from 'expo-location';
 import { Audio } from 'expo-av';
-import MapView, { MapViewAnimated, Marker, Polyline } from 'react-native-maps';
+import MapView, { Marker, Polyline } from 'react-native-maps';
 import mapStyle from './mapstyle';
 
 export default function App() {
@@ -24,6 +25,18 @@ export default function App() {
     longitude: -122.4324,
   });
   const [mapTrail, setMapTrail] = useState([markerCoord]);
+  //? For storing fetched data
+  const [postsFromAPI, setPostsFromAPI] = useState([]);
+
+  //? fetch data from mock api
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const handleFetchPosts = useCallback(async () => {
+    const result = await fetch('https://jsonplaceholder.typicode.com/posts');
+    const posts = await result.json();
+    if (result.ok) {
+      setPostsFromAPI(posts);
+    }
+  });
 
   //? used to access methods on the MapView component (for animation)
   const mapView = useRef(null);
@@ -118,6 +131,21 @@ export default function App() {
     );
   }
 
+  //? used to conditionally render items from fetched array
+  //todo replace with sounds from Freesound API
+  function renderOnePost({ item, index }) {
+    if (index % 5 === 1) {
+      return (
+        <View>
+          <Text>{item.body}</Text>
+          <Text></Text>
+        </View>
+      );
+    } else {
+      return;
+    }
+  }
+
   //todo set up navigation
   return (
     <View style={styles.container}>
@@ -142,9 +170,11 @@ export default function App() {
           // }
           onPress={mapAnimateNavigation}
         />
+        <Text>{'         '}</Text>
+        <Button title="API" color="peru" onPress={handleFetchPosts} />
       </View>
-      <Text>{'        '}</Text>
-      <Text>{'         '}</Text>
+      <Text>{''}</Text>
+      <Text>{''}</Text>
       <MapView
         ref={mapView}
         style={styles.map}
@@ -177,6 +207,11 @@ export default function App() {
       <Text>
         Marker at: {markerCoord.latitude}, {markerCoord.longitude}
       </Text>
+      <FlatList
+        data={postsFromAPI}
+        keyExtractor={(item) => item.id}
+        renderItem={renderOnePost}
+      />
       <StatusBar style="auto" />
     </View>
   );
