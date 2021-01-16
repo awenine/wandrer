@@ -8,7 +8,9 @@ import Main from './Main.js';
 export default function App() {
   const Drawer = createDrawerNavigator();
 
-  //todo set up navigation
+  //todo use drawer as 'history' tab to show tracks that have been played
+  //todo set draw to swipe even when over map
+  //todo add visual cue (slight shadow?) where drawer can be swiped from
   return (
     <NavigationContainer>
       <Drawer.Navigator

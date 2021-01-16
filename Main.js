@@ -50,12 +50,10 @@ const Main = () => {
   //? used to access methods on the MapView component (for animation)
   const mapView = useRef(null);
 
-  //todo check playing in background, lock screen/menu notifications
+  //* sound continues to play in background but no lockscreen solution found
   async function playSound() {
     setSoundLoadMsg('Loading Sound');
     const { sound } = await Audio.Sound.createAsync(
-      //* for playing sound files stored in assets
-      // require('./assets/FFX_arp_sound.mp3'),
       //* for playing sounds from URL (below route returned by freesound api > 'previews')
       //todo make dynamic based on API requests using fetched location
       { uri: 'https://freesound.org/data/previews/401/401145_1821057-lq.mp3' },
@@ -88,7 +86,6 @@ const Main = () => {
       : undefined;
   }, [sound]);
 
-  //todo seperate into components
   //? Location settup
   useEffect(() => {
     (async () => {
@@ -155,7 +152,7 @@ const Main = () => {
     }
   }
 
-  //? use to save quotes to storage
+  //? use to save to storage
   async function saveToStorage() {
     console.log(quote);
     try {
@@ -183,9 +180,9 @@ const Main = () => {
     loadFromStorage();
   }, []);
 
-  //todo set up navigation
   return (
     <View style={styles.container}>
+      {/* MAP */}
       <MapView
         ref={mapView}
         style={styles.map}
@@ -201,6 +198,7 @@ const Main = () => {
           latitudeDelta: 0.0422,
           longitudeDelta: 0.0322,
         }}
+        // accesses seperate mapstyle.js file for customising the maps appearance
         customMapStyle={mapStyle}
         // showsUserLocation-true // NOTE - fails silently, other dependencies
       >
@@ -214,6 +212,7 @@ const Main = () => {
         />
         <Polyline coordinates={mapTrail} />
       </MapView>
+      {/* SCROLLING CONTAINER FOR MUSIC PLAYER (currently sandbox for testing) */}
       <ScrollView>
         <Text>Wandrer (proto)</Text>
         <Text style={styles.subtitle}>made using Freesound</Text>
@@ -228,12 +227,6 @@ const Main = () => {
             id="horaldo"
             color="blue"
             title="Move Map"
-            //  jumps map refion and marker to this location
-            // onPress={() => setMarkerCoord({
-            //     latitude: 38.78825,
-            //     longitude: -121.4324,
-            //   })
-            // }
             onPress={mapAnimateNavigation}
           />
           <Text>{'         '}</Text>
