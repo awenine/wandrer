@@ -16,7 +16,9 @@ import * as Location from 'expo-location';
 import { Audio } from 'expo-av';
 import MapView, { Marker, Polyline } from 'react-native-maps';
 import mapStyle from './mapstyle';
+import APIsounds from './mockAPI';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { set } from 'react-native-reanimated';
 
 const Main = () => {
   const [sound, setSound] = useState(null);
@@ -34,6 +36,13 @@ const Main = () => {
   const [randNum, setRandNum] = useState(0);
   //? Quote to store locally
   const [quote, setQuote] = useState();
+
+  //? mock api of fetched sounds
+  const [playlist, setPlaylist] = useState(APIsounds.results);
+  //? current song/track
+  const [currentTrack, setCurrentTrack] = useState(null);
+  //? history of visited locations
+  const [locationHistory, setLocationHistory] = useState([]);
 
   //? fetch data from mock api
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -103,20 +112,23 @@ const Main = () => {
         return;
       }
       //* fetch location
-      let location = await Location.getLastKnownPositionAsync({});
-      setLocation(location);
+      let result = await Location.getLastKnownPositionAsync({});
+      if (result) {
+        let { longitude, latitude } = result.coords;
+        setLocation({ longitude, latitude });
+      }
     })();
-  }, [sound]);
+  }, []);
 
-  //? Update location text
-  //todo look at updating map displays
-  let locationText = 'Fetching location...';
-  if (errorMsg) {
-    locationText = errorMsg;
-  } else if (location) {
-    let { longitude, latitude } = location.coords;
-    locationText = 'You are at ' + latitude + ', ' + longitude;
-  }
+  // const handleFetchPosts = useCallback(async () => {
+  //   console.log('handling...');
+  //   const result = await fetch('https://jsonplaceholder.typicode.com/posts');
+  //   const posts = await result.json();
+  //   if (result.ok) {
+  //     setPostsFromAPI(posts);
+  //   }
+  //   setRandNum(Math.floor(Math.random() * postsFromAPI.length));
+  // });
 
   function handleMarkerDrag(e) {
     const newCoords = e.nativeEvent.coordinate;
@@ -180,23 +192,40 @@ const Main = () => {
     loadFromStorage();
   }, []);
 
+  function nextLocation() {
+    // set a random number within 0-playlist.length-1
+    const trackNum = Math.floor(Math.random() * playlist.length);
+    const selectedTrack = playlist[trackNum];
+    // check item in playlist[random number]
+    setCurrentTrack(selectedTrack);
+    setPlaylist(playlist.filter((_, i) => i !== trackNum));
+    setLocationHistory([
+      ...locationHistory,
+      { ...selectedTrack, datePlayed: Date.now() },
+    ]);
+    if (currentTrack !== null) {
+      let newCoords = currentTrack.geotag.split(' ').map((coord) => +coord);
+      setLocation({ latitude: newCoords[0], longitude: newCoords[1] });
+    }
+  }
+
   return (
     <View style={styles.container}>
       {/* MAP */}
       <MapView
         ref={mapView}
         style={styles.map}
-        initialRegion={{
-          latitude: 37.78825,
-          longitude: -122.4324,
-          // these delta values are used to avoid stretching the map, only the largest one is used
-          latitudeDelta: 0.0422,
-          longitudeDelta: 0.0922,
-        }}
+        // initialRegion={{
+        //   latitude: 37.78825,
+        //   longitude: -122.4324,
+        //   // these delta values are used to avoid stretching the map, only the largest one is used
+        //   latitudeDelta: 0.0422,
+        //   longitudeDelta: 0.0022,
+        // }}
         region={{
           ...markerCoord,
-          latitudeDelta: 0.0422,
-          longitudeDelta: 0.0322,
+          latitudeDelta: 0.15,
+          longitudeDelta: 0.15,
         }}
         // accesses seperate mapstyle.js file for customising the maps appearance
         customMapStyle={mapStyle}
@@ -214,9 +243,9 @@ const Main = () => {
       </MapView>
       {/* SCROLLING CONTAINER FOR MUSIC PLAYER (currently sandbox for testing) */}
       <ScrollView>
+        <Button color="orchid" title="Next Location" onPress={nextLocation} />
         <Text>Wandrer (proto)</Text>
         <Text style={styles.subtitle}>made using Freesound</Text>
-        <Text>{locationText}</Text>
         <Text style={styles.soundload}>{soundLoadMsg}</Text>
         <View style={styles.buttons}>
           <Button color="darkseagreen" title="Play" onPress={playSound} />
