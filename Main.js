@@ -137,11 +137,11 @@ const Main = () => {
     setMapTrail([...mapTrail, newCoords]);
   }
 
-  function mapAnimateNavigation() {
+  function mapAnimateNavigation(region) {
+    console.log(region);
     mapView.current.animateToRegion(
       {
-        latitude: 36.28825,
-        longitude: -122.9324,
+        ...region,
         latitudeDelta: 0.0422,
         longitudeDelta: 0.0922,
       },
@@ -194,6 +194,7 @@ const Main = () => {
 
   function nextLocation() {
     // set a random number within 0-playlist.length-1
+    //todo check if playlist empty, if so re-fetch
     const trackNum = Math.floor(Math.random() * playlist.length);
     const selectedTrack = playlist[trackNum];
     // check item in playlist[random number]
@@ -209,21 +210,20 @@ const Main = () => {
     }
   }
 
+  function handleMoveCamera(destination) {
+    nextLocation();
+    mapAnimateNavigation(destination);
+  }
+
   return (
     <View style={styles.container}>
       {/* MAP */}
       <MapView
         ref={mapView}
         style={styles.map}
-        // initialRegion={{
-        //   latitude: 37.78825,
-        //   longitude: -122.4324,
-        //   // these delta values are used to avoid stretching the map, only the largest one is used
-        //   latitudeDelta: 0.0422,
-        //   longitudeDelta: 0.0022,
-        // }}
-        region={{
-          ...markerCoord,
+        initialRegion={{
+          //* keep as initial region and look at how updated
+          ...location,
           latitudeDelta: 0.15,
           longitudeDelta: 0.15,
         }}
@@ -243,7 +243,13 @@ const Main = () => {
       </MapView>
       {/* SCROLLING CONTAINER FOR MUSIC PLAYER (currently sandbox for testing) */}
       <ScrollView>
-        <Button color="orchid" title="Next Location" onPress={nextLocation} />
+        <Button
+          id="Move Camera"
+          color="orchid"
+          title="Next Location"
+          onPress={() => handleMoveCamera(location)} //* Now animates to next location
+        />
+        <Text>Current track ~ {currentTrack ? currentTrack.name : ''}</Text>
         <Text>Wandrer (proto)</Text>
         <Text style={styles.subtitle}>made using Freesound</Text>
         <Text style={styles.soundload}>{soundLoadMsg}</Text>
@@ -256,7 +262,7 @@ const Main = () => {
             id="horaldo"
             color="blue"
             title="Move Map"
-            onPress={mapAnimateNavigation}
+            onPress={() => mapAnimateNavigation(location)} //! needs to be a callback (?)
           />
           <Text>{'         '}</Text>
           <Button title="API" color="peru" onPress={handleFetchPosts} />
