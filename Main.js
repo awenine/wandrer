@@ -7,7 +7,6 @@ import {
   Button,
   Dimensions,
   FlatList,
-  TextInput,
   ScrollView,
 } from 'react-native';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
@@ -22,7 +21,11 @@ import { set } from 'react-native-reanimated';
 
 const Main = () => {
   const [sound, setSound] = useState(null);
-  const [location, setLocation] = useState(null);
+  const [location, setLocation] = useState({
+    // default if location not yet loaded...
+    latitude: 37.78825,
+    longitude: -122.4324,
+  });
   const [errorMsg, setErrorMsg] = useState(null);
   const [soundLoadMsg, setSoundLoadMsg] = useState('Waiting to play...');
   const [markerCoord, setMarkerCoord] = useState({
@@ -192,23 +195,13 @@ const Main = () => {
     }
   }
 
-  useEffect(() => {
-    loadFromStorage();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tally]);
-
   function nextLocation() {
     // set a random number within 0-playlist.length-1
     //todo check if playlist empty, if so re-fetch
     const trackNum = Math.floor(Math.random() * playlist.length);
-    const selectedTrack = playlist[trackNum];
     // check item in playlist[random number]
-    setCurrentTrack(selectedTrack);
+    setCurrentTrack(playlist[trackNum]);
     setPlaylist(playlist.filter((_, i) => i !== trackNum));
-    // setLocationHistory([
-    //   ...locationHistory,
-    //   { ...selectedTrack, datePlayed: Date.now() },
-    // ]);
     // increments the tally of stored tracks
     setTally((currentTally) => currentTally + 1);
     // stores track using tally as key
@@ -223,6 +216,8 @@ const Main = () => {
     if (currentTrack !== null) {
       storeTrackToHistory(currentTrack);
     }
+    saveToStorage('storedTally', tally);
+    loadFromStorage();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tally]);
 
@@ -295,26 +290,26 @@ const Main = () => {
           <Button title="API" color="peru" onPress={handleFetchPosts} />
         </View>
         <Text>{''}</Text>
-        <Text>{''}</Text>
         {/* Get and print coordinates of marker when moved */}
         <Text>
           Marker at: {markerCoord.latitude}, {markerCoord.longitude}
         </Text>
-        <FlatList
+        {/* <FlatList
           style={styles.flatlist}
           data={postsFromAPI}
           keyExtractor={(item) => item.id + ''} // NOTE: id expects string
           renderItem={({ item, index }) =>
             renderOnePost({ item, index }, randNum)
           }
-        />
+        /> */}
         {/* For testing local storage (for favourites) */}
-        <TextInput
+        {/* <TextInput
           style={styles.input}
           onChangeText={(text) => setQuote(text)}
-        />
-        <Button color="teal" title="Save this quote" onPress={saveToStorage} />
-        <Text>Quote: {quote}</Text>
+        /> */}
+        {/* <Button color="teal" title="Save this quote" onPress={saveToStorage} /> */}
+        <Text>{''}</Text>
+        <Text>Current tally in local storage: {quote}</Text>
         <StatusBar style="auto" />
       </ScrollView>
     </View>
