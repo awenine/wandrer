@@ -142,6 +142,11 @@ const Main = () => {
     setMapTrail([...mapTrail, newCoords]);
   }
 
+  //? run whenever location changes
+  useEffect(() => {
+    mapAnimateNavigation(location);
+  }, [location]);
+
   function mapAnimateNavigation(region) {
     console.log(region);
     mapView.current.animateToRegion(
@@ -195,6 +200,11 @@ const Main = () => {
     }
   }
 
+  useEffect(() => {
+    console.log('location: ', location);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   function nextLocation() {
     // set a random number within 0-playlist.length-1
     //todo check if playlist empty, if so re-fetch
@@ -205,11 +215,19 @@ const Main = () => {
     // increments the tally of stored tracks
     setTally((currentTally) => currentTally + 1);
     //* tally triggers useEffect with other functions to maintain execution order
+    // if (currentTrack !== null) {
+    //   let newCoords = currentTrack.geotag.split(' ').map((coord) => +coord);
+    //   setLocation({ latitude: newCoords[0], longitude: newCoords[1] });
+    // }
+  }
+
+  useEffect(() => {
     if (currentTrack !== null) {
       let newCoords = currentTrack.geotag.split(' ').map((coord) => +coord);
       setLocation({ latitude: newCoords[0], longitude: newCoords[1] });
     }
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentTrack]);
 
   useEffect(() => {
     if (currentTrack !== null) {
@@ -229,7 +247,7 @@ const Main = () => {
 
   function handleMoveCamera(destination) {
     nextLocation();
-    mapAnimateNavigation(destination);
+    // mapAnimateNavigation(destination);
   }
 
   return (
