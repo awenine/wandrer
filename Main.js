@@ -136,10 +136,14 @@ const Main = () => {
   // });
 
   function handleMarkerDrag(e) {
-    const newCoords = e.nativeEvent.coordinate;
+    const newCoords = e.nativeEvent.coordinate; // change to given coordingates
     setMarkerCoord(newCoords);
     //? draw "trail" on map recording movement history of the marker & mapping to Polyline component
     setMapTrail([...mapTrail, newCoords]);
+  }
+
+  function handleMapPress(e) {
+    setLocation(e.nativeEvent.coordinate);
   }
 
   //? run whenever location changes
@@ -156,7 +160,7 @@ const Main = () => {
         latitudeDelta: 0.0422,
         longitudeDelta: 0.0922,
       },
-      2000,
+      1500,
     );
   }
 
@@ -264,14 +268,14 @@ const Main = () => {
         // accesses seperate mapstyle.js file for customising the maps appearance
         customMapStyle={mapStyle}
         // showsUserLocation-true // NOTE - fails silently, other dependencies
+        onPress={handleMapPress}
       >
         <Marker
-          draggable
           coordinate={{
             latitude: markerCoord.latitude,
             longitude: markerCoord.longitude,
           }}
-          onDragEnd={handleMarkerDrag}
+          // onDragEnd={handleMarkerDrag} // needs to be called on play of tracks (sets next polyline coord)
         />
         <Polyline coordinates={mapTrail} />
       </MapView>
