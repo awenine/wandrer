@@ -123,6 +123,8 @@ const Main = () => {
         setLocation({ longitude, latitude });
       }
     })();
+    // update current tally of stored items
+    loadTallyFromStorage();
   }, []);
 
   // const handleFetchPosts = useCallback(async () => {
@@ -191,7 +193,20 @@ const Main = () => {
     }
   }
 
-  //? Load from localstorage on startup
+  //? Load from localstorage when tally updated
+  async function loadTallyFromStorage() {
+    try {
+      const itemsInHistory = await AsyncStorage.getItem('storedTally');
+      if (itemsInHistory) {
+        setTally(JSON.parse(itemsInHistory));
+      }
+    } catch (error) {
+      // eslint-disable-next-line no-alert
+      alert(error);
+    }
+  }
+
+  //? Load tally from localstorage on startup
   async function loadFromStorage() {
     try {
       const trackJSON = await AsyncStorage.getItem(tally.toString());
@@ -204,11 +219,6 @@ const Main = () => {
       alert(error);
     }
   }
-
-  useEffect(() => {
-    console.log('location: ', location);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   function nextLocation() {
     // set a random number within 0-playlist.length-1
@@ -256,7 +266,7 @@ const Main = () => {
   }
 
   function consoleLogger() {
-    console.log('logger');
+    console.log('tally = ', tally);
   }
 
   return (
