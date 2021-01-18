@@ -44,6 +44,9 @@ const Main = () => {
   //? history of visited locations
   const [locationHistory, setLocationHistory] = useState([]);
 
+  //? tally for storing & retrieving history
+  const [tally, setTally] = useState(0);
+
   //? fetch data from mock api
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleFetchPosts = useCallback(async () => {
@@ -100,7 +103,7 @@ const Main = () => {
       //* check whether app is running on phone or emulator
       if (Platform.OS === 'android' && !Constants.isDevice) {
         setErrorMsg(
-          'Sorry, this will not work in an Android emulator. Try it on your device!',
+          'Sorry, geolocation will not work in an Android emulator. Try it on your device!',
         );
         return;
       }
@@ -163,11 +166,12 @@ const Main = () => {
     }
   }
 
+  //todo how to best create unique id for each item saved? id_date?
   //? use to save to storage
-  async function saveToStorage() {
-    console.log(quote);
+  async function saveToStorage(key, item) {
+    const trackJSON = JSON.stringify(item);
     try {
-      await AsyncStorage.setItem('quote', quote);
+      await AsyncStorage.setItem(key, trackJSON);
     } catch (error) {
       // eslint-disable-next-line no-alert
       alert(error);
@@ -177,9 +181,10 @@ const Main = () => {
   //? Load from localstorage on startup
   async function loadFromStorage() {
     try {
-      let savedQuote = await AsyncStorage.getItem('quote');
-      if (savedQuote) {
-        setQuote(savedQuote);
+      const trackJSON = await AsyncStorage.getItem(tally.toString());
+      if (trackJSON) {
+        const track = JSON.parse(trackJSON);
+        setQuote(track.name);
       }
     } catch (error) {
       // eslint-disable-next-line no-alert
@@ -189,7 +194,8 @@ const Main = () => {
 
   useEffect(() => {
     loadFromStorage();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tally]);
 
   function nextLocation() {
     // set a random number within 0-playlist.length-1
@@ -199,14 +205,32 @@ const Main = () => {
     // check item in playlist[random number]
     setCurrentTrack(selectedTrack);
     setPlaylist(playlist.filter((_, i) => i !== trackNum));
-    setLocationHistory([
-      ...locationHistory,
-      { ...selectedTrack, datePlayed: Date.now() },
-    ]);
+    // setLocationHistory([
+    //   ...locationHistory,
+    //   { ...selectedTrack, datePlayed: Date.now() },
+    // ]);
+    // increments the tally of stored tracks
+    setTally((currentTally) => currentTally + 1);
+    // stores track using tally as key
+    // storeTrackToHistory(selectedTrack);
     if (currentTrack !== null) {
       let newCoords = currentTrack.geotag.split(' ').map((coord) => +coord);
       setLocation({ latitude: newCoords[0], longitude: newCoords[1] });
     }
+  }
+
+  useEffect(() => {
+    if (currentTrack !== null) {
+      storeTrackToHistory(currentTrack);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tally]);
+
+  function storeTrackToHistory(track) {
+    console.log('tally: ', tally);
+    const item = { ...track, datePlayed: Date.now() };
+    const key = tally.toString();
+    saveToStorage(key, item);
   }
 
   function handleMoveCamera(destination) {
