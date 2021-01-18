@@ -199,7 +199,9 @@ const Main = () => {
       const itemsInHistory = await AsyncStorage.getItem('storedTally');
       if (itemsInHistory) {
         setTally(JSON.parse(itemsInHistory));
+        // setTally(0); // used for hard reset of local storage
       }
+      console.log('Tally set from storage to', itemsInHistory);
     } catch (error) {
       // eslint-disable-next-line no-alert
       alert(error);
@@ -267,7 +269,38 @@ const Main = () => {
 
   function consoleLogger() {
     console.log('tally = ', tally);
+    // clearStorage();
+    // loadTallyFromStorage();
+    // getAllKeys();
   }
+
+  //? clears local storage of all tracks and tally (FOR RESET)
+  // const clearStorage = async () => {
+  //   console.log('tally in clearStorage: ', tally);
+  //   const slots = [...Array(tally)].map((_, i) => (i + 1).toString());
+  //   console.log('slots: ', slots);
+  //   const keys = [...slots, 'storedTally'];
+  //   console.log('keys: ', keys);
+  //   try {
+  //     await AsyncStorage.multiRemove(keys)
+  //   } catch (e) {
+  //     // remove error
+  //   }
+  //   console.log('Storage cleared');
+  // };
+
+  //? retrieve keys in local storage (FOR RESET)
+  // const getAllKeys = async () => {
+  //   let keys = [];
+  //   try {
+  //     keys = await AsyncStorage.getAllKeys()
+  //   } catch (e) {
+  //     // read key error
+  //   }
+  //   console.log('keys: ', keys);
+  //   // example console.log result:
+  //   // ['@MyApp_user', '@MyApp_key']
+  // };
 
   return (
     <View style={styles.container}>
