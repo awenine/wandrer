@@ -156,18 +156,18 @@ const Main = () => {
 
   //? used to conditionally render items from fetched array
   //todo replace with sounds from Freesound API
-  function renderOnePost({ item, index }, number) {
-    if (index === number) {
-      return (
-        <View>
-          <Text>{item.title}</Text>
-          <Text></Text>
-        </View>
-      );
-    } else {
-      return;
-    }
-  }
+  // function renderOnePost({ item, index }, number) {
+  //   if (index === number) {
+  //     return (
+  //       <View>
+  //         <Text>{item.title}</Text>
+  //         <Text></Text>
+  //       </View>
+  //     );
+  //   } else {
+  //     return;
+  //   }
+  // }
 
   //todo how to best create unique id for each item saved? id_date?
   //? use to save to storage
@@ -204,8 +204,7 @@ const Main = () => {
     setPlaylist(playlist.filter((_, i) => i !== trackNum));
     // increments the tally of stored tracks
     setTally((currentTally) => currentTally + 1);
-    // stores track using tally as key
-    // storeTrackToHistory(selectedTrack);
+    //* tally triggers useEffect with other functions to maintain execution order
     if (currentTrack !== null) {
       let newCoords = currentTrack.geotag.split(' ').map((coord) => +coord);
       setLocation({ latitude: newCoords[0], longitude: newCoords[1] });
@@ -280,14 +279,6 @@ const Main = () => {
           <Text>{'         '}</Text>
           <Button color="maroon" title="Stop" onPress={stopSound} />
           <Text>{'         '}</Text>
-          <Button
-            id="horaldo"
-            color="blue"
-            title="Move Map"
-            onPress={() => mapAnimateNavigation(location)} //! needs to be a callback (?)
-          />
-          <Text>{'         '}</Text>
-          <Button title="API" color="peru" onPress={handleFetchPosts} />
         </View>
         <Text>{''}</Text>
         {/* Get and print coordinates of marker when moved */}
@@ -302,12 +293,6 @@ const Main = () => {
             renderOnePost({ item, index }, randNum)
           }
         /> */}
-        {/* For testing local storage (for favourites) */}
-        {/* <TextInput
-          style={styles.input}
-          onChangeText={(text) => setQuote(text)}
-        /> */}
-        {/* <Button color="teal" title="Save this quote" onPress={saveToStorage} /> */}
         <Text>{''}</Text>
         <Text>Current tally in local storage: {quote}</Text>
         <StatusBar style="auto" />
