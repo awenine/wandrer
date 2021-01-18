@@ -229,7 +229,6 @@ const Main = () => {
       // set new location
       setLocation({ latitude: newCoords[0], longitude: newCoords[1] });
       // autoplay next track
-      //! NOTE - playing on initialisation...add another check?
       playSound(currentTrack);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -254,6 +253,10 @@ const Main = () => {
   function handleMoveCamera(destination) {
     nextLocation();
     // mapAnimateNavigation(destination);
+  }
+
+  function consoleLogger() {
+    console.log('logger');
   }
 
   return (
@@ -302,6 +305,8 @@ const Main = () => {
           />
           <Text>{'         '}</Text>
           <Button color="maroon" title="Stop" onPress={stopSound} />
+          <Text>{'         '}</Text>
+          <Button color="peru" title="Log" onPress={consoleLogger} />
           <Text>{'         '}</Text>
         </View>
         <Text>{''}</Text>
