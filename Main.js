@@ -145,6 +145,7 @@ const Main = () => {
   //? run whenever location changes
   useEffect(() => {
     mapAnimateNavigation(location);
+    setMarkerCoord(location);
   }, [location]);
 
   function mapAnimateNavigation(region) {
@@ -215,15 +216,13 @@ const Main = () => {
     // increments the tally of stored tracks
     setTally((currentTally) => currentTally + 1);
     //* tally triggers useEffect with other functions to maintain execution order
-    // if (currentTrack !== null) {
-    //   let newCoords = currentTrack.geotag.split(' ').map((coord) => +coord);
-    //   setLocation({ latitude: newCoords[0], longitude: newCoords[1] });
-    // }
   }
 
   useEffect(() => {
     if (currentTrack !== null) {
+      // format coordinates
       let newCoords = currentTrack.geotag.split(' ').map((coord) => +coord);
+      // set new location
       setLocation({ latitude: newCoords[0], longitude: newCoords[1] });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
