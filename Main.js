@@ -60,12 +60,11 @@ const Main = () => {
   const mapView = useRef(null);
 
   //* sound continues to play in background but no lockscreen solution found
-  async function playSound() {
+  async function playSound(soundLink) {
     setSoundLoadMsg('Loading Sound');
     const { sound } = await Audio.Sound.createAsync(
       //* for playing sounds from URL (below route returned by freesound api > 'previews')
-      //todo make dynamic based on API requests using fetched location
-      { uri: 'https://freesound.org/data/previews/401/401145_1821057-lq.mp3' },
+      { uri: soundLink.previews['preview-lq-mp3'] },
     );
     setSound(sound);
 
@@ -254,7 +253,11 @@ const Main = () => {
         <Text style={styles.subtitle}>made using Freesound</Text>
         <Text style={styles.soundload}>{soundLoadMsg}</Text>
         <View style={styles.buttons}>
-          <Button color="darkseagreen" title="Play" onPress={playSound} />
+          <Button
+            color="darkseagreen"
+            title="Play"
+            onPress={() => playSound(currentTrack)}
+          />
           <Text>{'         '}</Text>
           <Button color="maroon" title="Stop" onPress={stopSound} />
           <Text>{'         '}</Text>
