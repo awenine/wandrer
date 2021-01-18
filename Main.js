@@ -228,6 +228,9 @@ const Main = () => {
       let newCoords = currentTrack.geotag.split(' ').map((coord) => +coord);
       // set new location
       setLocation({ latitude: newCoords[0], longitude: newCoords[1] });
+      // autoplay next track
+      //! NOTE - playing on initialisation...add another check?
+      playSound(currentTrack);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentTrack]);
