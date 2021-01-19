@@ -6,7 +6,6 @@ import {
   View,
   Button,
   Dimensions,
-  FlatList,
   ScrollView,
 } from 'react-native';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
@@ -26,31 +25,26 @@ const Main = () => {
     latitude: 37.78825,
     longitude: -122.4324,
   });
-  const [errorMsg, setErrorMsg] = useState(null);
+  const [errorMsg, setErrorMsg] = useState(null); //! not using currently
   const [soundLoadMsg, setSoundLoadMsg] = useState('Waiting to play...');
   const [markerCoord, setMarkerCoord] = useState({
     latitude: 37.78825,
     longitude: -122.4324,
   });
-  const [mapTrail, setMapTrail] = useState([markerCoord]);
-  //? For storing fetched data
-  const [postsFromAPI, setPostsFromAPI] = useState([]);
-  //? Random number to grab specific post from postsFromAPI
-  const [randNum, setRandNum] = useState(0);
+
+  const [mapTrail, setMapTrail] = useState([]);
   //? Quote to store locally
   const [quote, setQuote] = useState();
 
-  //? mock api of fetched sounds
+  //? current tracks cued (defaults to mock API)
   const [playlist, setPlaylist] = useState(APIsounds.results);
   //? current song/track
   const [currentTrack, setCurrentTrack] = useState(null);
-  //? history of visited locations
-  const [locationHistory, setLocationHistory] = useState([]);
 
   //? tally for storing & retrieving history
   const [tally, setTally] = useState(0);
 
-  //? fetch data from mock api
+  //? fetch data from api
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleFetchAPI = useCallback(async () => {
     console.log('handling fetch...');
@@ -70,7 +64,6 @@ const Main = () => {
       console.log('New Playlist Loaded');
       console.log('fetchedPlaylist: ', fetchedPlaylist);
     }
-    // setRandNum(Math.floor(Math.random() * postsFromAPI.length));
   });
 
   //? used to access methods on the MapView component (for animation)
@@ -144,16 +137,6 @@ const Main = () => {
     // update current tally of stored items
     loadTallyFromStorage();
   }, []);
-
-  // const handleFetchPosts = useCallback(async () => {
-  //   console.log('handling...');
-  //   const result = await fetch('https://jsonplaceholder.typicode.com/posts');
-  //   const posts = await result.json();
-  //   if (result.ok) {
-  //     setPostsFromAPI(posts);
-  //   }
-  //   setRandNum(Math.floor(Math.random() * postsFromAPI.length));
-  // });
 
   function handleMarkerDrag(e) {
     const newCoords = e.nativeEvent.coordinate; // change to given coordingates
@@ -256,8 +239,10 @@ const Main = () => {
     if (currentTrack !== null) {
       // format coordinates
       let newCoords = currentTrack.geotag.split(' ').map((coord) => +coord);
+      const newCoordObj = { latitude: newCoords[0], longitude: newCoords[1] };
       // set new location
-      setLocation({ latitude: newCoords[0], longitude: newCoords[1] });
+      setLocation(newCoordObj);
+      setMapTrail([...mapTrail, newCoordObj]);
       // autoplay next track
       playSound(currentTrack);
     }
