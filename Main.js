@@ -228,16 +228,20 @@ const Main = () => {
     }
   }
 
-  function nextLocation() {
-    // set a random number within 0-playlist.length-1
-    //todo check if playlist empty, if so re-fetch
-    const trackNum = Math.floor(Math.random() * playlist.length);
-    // check item in playlist[random number]
-    setCurrentTrack(playlist[trackNum]);
-    setPlaylist(playlist.filter((_, i) => i !== trackNum));
-    // increments the tally of stored tracks
-    setTally((currentTally) => currentTally + 1);
-    //* tally triggers useEffect with other functions to maintain execution order
+  async function nextLocation() {
+    if (playlist.length === 0) {
+      await handleFetchAPI(200);
+      const check = await playlist;
+      if (check.length !== 0) {
+        nextLocation();
+      }
+    } else {
+      const trackNum = Math.floor(Math.random() * playlist.length);
+      setCurrentTrack(playlist[trackNum]);
+      setPlaylist(playlist.filter((_, i) => i !== trackNum));
+      setTally((currentTally) => currentTally + 1);
+      //* tally triggers useEffect with other functions to maintain execution order
+    }
   }
 
   useEffect(() => {
@@ -272,9 +276,10 @@ const Main = () => {
       //   console.log("newCoords: ",newCoords);
       // } else {
       playSound(track);
+    } else {
+      console.log('No track loaded');
+      // nextLocation()
     }
-    // }
-    console.log('no current track');
   }
 
   function storeTrackToHistory(track) {
