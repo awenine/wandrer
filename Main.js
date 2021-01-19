@@ -46,23 +46,28 @@ const Main = () => {
 
   //? fetch data from api
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const handleFetchAPI = useCallback(async () => {
+  const handleFetchAPI = useCallback(async (radius) => {
     console.log('handling fetch...');
+    console.log('Search Radius: ', radius);
     const route =
       'https://freesound.org/apiv2/search/text/?filter=%7B%21geofilt%20sfield=geotag%20pt=' +
       markerCoord.latitude +
       ',' +
       markerCoord.longitude +
       '%20d=' +
-      '100' + // radius of search results in km
+      radius.toString() + // radius of search results in km
       '%7D%20&fields=id,previews,name,description,username,geotag&token=' +
       TOKEN;
     const result = await fetch(route);
     const fetchedPlaylist = await result.json();
     if (result.ok) {
-      setPlaylist(fetchedPlaylist.results);
-      console.log('New Playlist Loaded');
-      console.log('fetchedPlaylist: ', fetchedPlaylist);
+      if (fetchedPlaylist.count === 0) {
+        //* ie no songs within range
+        handleFetchAPI(radius * 5); // increase radius of search
+      } else {
+        setPlaylist(fetchedPlaylist.results);
+        console.log('New Playlist loaded,', fetchedPlaylist.count, 'items');
+      }
     }
   });
 
@@ -366,7 +371,11 @@ const Main = () => {
           <Text>{'         '}</Text>
           <Button color="peru" title="Log" onPress={consoleLogger} />
           <Text>{'         '}</Text>
-          <Button color="blue" title="API" onPress={handleFetchAPI} />
+          <Button
+            color="blue"
+            title="API"
+            onPress={() => handleFetchAPI(100)} // 100 is the default search radius
+          />
         </View>
         <Text>{''}</Text>
         {/* Get and print coordinates of marker when moved */}
