@@ -333,6 +333,7 @@ const Main = () => {
       </View>
       {/* SCROLLING CONTAINER FOR MUSIC PLAYER (currently sandbox for testing) */}
       <ScrollView>
+        <Text>Tally is {tally}</Text>
         <Button
           id="Move Camera"
           color="orchid"
