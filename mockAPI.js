@@ -1,7 +1,7 @@
 /* eslint-disable */
 
 //? call made via route:
-//* https://freesound.org/apiv2/search/text/?filter=%7B%21geofilt%20sfield=geotag%20pt=41.3833,2.1833%20d=10%7D%20&fields=id,previews,name,description,username,geotag&token=cAmmDL3Ce27SxQRAhaubZwFLTkVnKSop6vbzOom6
+//* https://freesound.org/apiv2/search/text/?filter=%7B%21geofilt%20sfield=geotag%20pt=41.3833,2.1833%20d=10%7D%20&fields=id,previews,name,description,username,geotag&token=*** *** ***
 //? getting data from within 10km of Barcelona
 //* coords: 41.3833, 2.1833
 

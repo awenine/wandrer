@@ -17,7 +17,7 @@ import MapView, { Marker, Polyline } from 'react-native-maps';
 import mapStyle from './mapstyle';
 import APIsounds from './mockAPI';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { set } from 'react-native-reanimated';
+import TOKEN from './mockEnv';
 
 const Main = () => {
   const [sound, setSound] = useState(null);
@@ -52,14 +52,25 @@ const Main = () => {
 
   //? fetch data from mock api
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const handleFetchPosts = useCallback(async () => {
-    console.log('handling...');
-    const result = await fetch('https://jsonplaceholder.typicode.com/posts');
-    const posts = await result.json();
+  const handleFetchAPI = useCallback(async () => {
+    console.log('handling fetch...');
+    const route =
+      'https://freesound.org/apiv2/search/text/?filter=%7B%21geofilt%20sfield=geotag%20pt=' +
+      markerCoord.latitude +
+      ',' +
+      markerCoord.longitude +
+      '%20d=' +
+      '100' + // radius of search results in km
+      '%7D%20&fields=id,previews,name,description,username,geotag&token=' +
+      TOKEN;
+    const result = await fetch(route);
+    const fetchedPlaylist = await result.json();
     if (result.ok) {
-      setPostsFromAPI(posts);
+      setPlaylist(fetchedPlaylist.results);
+      console.log('New Playlist Loaded');
+      console.log('fetchedPlaylist: ', fetchedPlaylist);
     }
-    setRandNum(Math.floor(Math.random() * postsFromAPI.length));
+    // setRandNum(Math.floor(Math.random() * postsFromAPI.length));
   });
 
   //? used to access methods on the MapView component (for animation)
@@ -263,7 +274,17 @@ const Main = () => {
   }, [tally]);
 
   function handlePlayButton(track) {
-    playSound(track);
+    if (track) {
+      // let newCoords = currentTrack.geotag.split(' ').map((coord) => +coord);
+      // if (markerCoord !== { latitude: newCoords[0], longitude: newCoords[1] }) {
+      //   console.log('different places or no track loaded');
+      //   console.log("markerCoord: ",markerCoord);
+      //   console.log("newCoords: ",newCoords);
+      // } else {
+      playSound(track);
+    }
+    // }
+    console.log('no current track');
   }
 
   function storeTrackToHistory(track) {
@@ -360,6 +381,7 @@ const Main = () => {
           <Text>{'         '}</Text>
           <Button color="peru" title="Log" onPress={consoleLogger} />
           <Text>{'         '}</Text>
+          <Button color="blue" title="API" onPress={handleFetchAPI} />
         </View>
         <Text>{''}</Text>
         {/* Get and print coordinates of marker when moved */}
