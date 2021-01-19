@@ -305,29 +305,32 @@ const Main = () => {
   return (
     <View style={styles.container}>
       {/* MAP */}
-      <MapView
-        ref={mapView}
-        style={styles.map}
-        initialRegion={{
-          //* keep as initial region and look at how updated
-          ...location,
-          latitudeDelta: 0.15,
-          longitudeDelta: 0.15,
-        }}
-        // accesses seperate mapstyle.js file for customising the maps appearance
-        customMapStyle={mapStyle}
-        // showsUserLocation-true // NOTE - fails silently, other dependencies
-        onPress={handleMapPress}
-      >
-        <Marker
-          coordinate={{
-            latitude: markerCoord.latitude,
-            longitude: markerCoord.longitude,
+      <View>
+        <View id="swipeArea" style={styles.thumbBar} />
+        <MapView
+          ref={mapView}
+          style={styles.map}
+          initialRegion={{
+            //* keep as initial region and look at how updated
+            ...location,
+            latitudeDelta: 0.15,
+            longitudeDelta: 0.15,
           }}
-          // onDragEnd={handleMarkerDrag} // needs to be called on play of tracks (sets next polyline coord)
-        />
-        <Polyline coordinates={mapTrail} />
-      </MapView>
+          // accesses seperate mapstyle.js file for customising the maps appearance
+          customMapStyle={mapStyle}
+          // showsUserLocation-true // NOTE - fails silently, other dependencies
+          onPress={handleMapPress}
+        >
+          <Marker
+            coordinate={{
+              latitude: markerCoord.latitude,
+              longitude: markerCoord.longitude,
+            }}
+            // onDragEnd={handleMarkerDrag} // needs to be called on play of tracks (sets next polyline coord)
+          />
+          <Polyline coordinates={mapTrail} />
+        </MapView>
+      </View>
       {/* SCROLLING CONTAINER FOR MUSIC PLAYER (currently sandbox for testing) */}
       <ScrollView>
         <Button
@@ -405,6 +408,16 @@ const styles = StyleSheet.create({
     fontSize: 24,
     backgroundColor: 'antiquewhite',
     marginVertical: 5,
+  },
+  // replace below with subtle fade to indicate presence of drawer
+  thumbBar: {
+    position: 'absolute',
+    backgroundColor: 'rgba(40, 89, 127, 0.48)',
+    top: 0,
+    left: 0,
+    height: Dimensions.get('window').height * 0.7,
+    width: Dimensions.get('window').width * 0.15,
+    zIndex: 100,
   },
 });
 
