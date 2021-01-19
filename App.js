@@ -12,6 +12,42 @@ export default function App() {
   // mock local storage
   const [mockStore, setMockStore] = useState([1, 2, 3, 4, 7, 1123]);
 
+  const [drawTally, setDrawTally] = useState(0);
+  const [drawHistory, setDrawHistory] = useState([]);
+
+  useEffect(() => {
+    loadTallyFromStorage();
+  }, []);
+
+  async function loadTallyFromStorage() {
+    try {
+      const itemsInHistory = await AsyncStorage.getItem('storedTally');
+      if (itemsInHistory) {
+        setDrawTally(JSON.parse(itemsInHistory));
+      }
+      console.log('Tally Drawer set to', itemsInHistory);
+    } catch (error) {
+      // eslint-disable-next-line no-alert
+      alert(error);
+    }
+  }
+
+  useEffect(() => {
+    loadDrawHistory();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [drawTally]);
+
+  async function loadDrawHistory() {
+    const keys = [...Array(drawTally)].map((_, i) => (i + 1).toString());
+    try {
+      const tracks = await AsyncStorage.multiGet(keys);
+      const tracksInfo = tracks.reverse().map((el) => JSON.parse(el[1]));
+      setDrawHistory(() => tracksInfo);
+    } catch (error) {
+      alert(error);
+    }
+  }
+
   //todo use drawer as 'history' tab to show tracks that have been played
   //todo set draw to swipe even when over map
   //todo add visual cue (slight shadow?) where drawer can be swiped from
@@ -22,9 +58,18 @@ export default function App() {
         drawerContent={() => (
           <FlatList
             // style={styles.flatlist}
-            data={mockStore}
-            keyExtractor={(item) => item + ''} // NOTE: id expects string, must be unique
-            renderItem={({ item, index }) => <Text>{item}</Text>}
+            data={drawHistory}
+            keyExtractor={(item) => item.datePlayed + ''} // NOTE: id expects string, must be unique
+            renderItem={({ item, index }) => (
+              <View>
+                <Text>{item.name}</Text>
+                <Text>By {item.username}</Text>
+                <Text>
+                  played on {new Date(item.datePlayed).toLocaleString('en-GB')}
+                </Text>
+                <Text>~~~</Text>
+              </View>
+            )}
           />
         )}
         initialRouteName="Main"
