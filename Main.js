@@ -12,6 +12,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Constants from 'expo-constants';
 import * as Location from 'expo-location';
 import { Audio } from 'expo-av';
+import { LinearGradient } from 'expo-linear-gradient';
 import MapView, { Marker, Polyline } from 'react-native-maps';
 import mapStyle from './mapstyle';
 import APIsounds from './mockAPI';
@@ -328,7 +329,12 @@ const Main = () => {
     <View style={styles.container}>
       {/* MAP */}
       <View>
-        <View id="swipeArea" style={styles.thumbBar} />
+        <LinearGradient
+          id="swipeArea"
+          colors={['rgba(0,0,0,0.4)', 'rgba(0,0,0,0.1)', 'transparent']}
+          start={[0, 0.5]}
+          end={[1, 0.5]}
+          style={styles.thumbBar}/>
         <MapView
           ref={mapView}
           style={styles.map}
@@ -439,11 +445,11 @@ const styles = StyleSheet.create({
   // replace below with subtle fade to indicate presence of drawer
   thumbBar: {
     position: 'absolute',
-    backgroundColor: 'rgba(40, 89, 127, 0.48)',
+    backgroundColor: 'rgba(40, 89, 127, 0)',
     top: 0,
     left: 0,
     height: Dimensions.get('window').height * 0.7,
-    width: Dimensions.get('window').width * 0.15,
+    width: Dimensions.get('window').width * 0.08,
     zIndex: 100,
   },
 });
