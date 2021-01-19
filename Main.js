@@ -74,8 +74,6 @@ const Main = () => {
     );
     sound.setOnPlaybackStatusUpdate(_onPlaybackStatusUpdate);
     setSound(sound);
-    console.log("sound.playbackStatus: ",sound.playbackStatus);
-
     await sound.playAsync();
     setSoundLoadMsg('Playing Sound');
   }
@@ -86,12 +84,11 @@ const Main = () => {
       console.log('***NEXT TRACK***');
       nextLocation();
     }
-  };
+  }
 
   function stopSound() {
     if (sound) {
       sound.stopAsync();
-      //! not sure if necessary, related to unloading
       setSound(null);
     }
   }
@@ -265,6 +262,10 @@ const Main = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tally]);
 
+  function handlePlayButton(track) {
+    playSound(track);
+  }
+
   function storeTrackToHistory(track) {
     console.log('tally: ', tally);
     const item = { ...track, datePlayed: Date.now() };
@@ -352,7 +353,7 @@ const Main = () => {
           <Button
             color="darkseagreen"
             title="Play"
-            onPress={() => playSound(currentTrack)}
+            onPress={() => handlePlayButton(currentTrack)}
           />
           <Text>{'         '}</Text>
           <Button color="maroon" title="Stop" onPress={stopSound} />
