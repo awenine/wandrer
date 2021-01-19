@@ -72,11 +72,21 @@ const Main = () => {
       //* for playing sounds from URL (below route returned by freesound api > 'previews')
       { uri: soundLink.previews['preview-lq-mp3'] },
     );
+    sound.setOnPlaybackStatusUpdate(_onPlaybackStatusUpdate);
     setSound(sound);
+    console.log("sound.playbackStatus: ",sound.playbackStatus);
 
     await sound.playAsync();
     setSoundLoadMsg('Playing Sound');
   }
+  //? fires on current track ending, autoplaying next track
+  function _onPlaybackStatusUpdate(playbackStatus) {
+    if (playbackStatus.didJustFinish) {
+      // The player has just finished playing and will stop.
+      console.log('***NEXT TRACK***');
+      nextLocation();
+    }
+  };
 
   function stopSound() {
     if (sound) {
@@ -262,11 +272,6 @@ const Main = () => {
     saveToStorage(key, item);
   }
 
-  function handleMoveCamera(destination) {
-    nextLocation();
-    // mapAnimateNavigation(destination);
-  }
-
   function consoleLogger() {
     console.log('tally = ', tally);
     // clearStorage();
@@ -333,12 +338,11 @@ const Main = () => {
       </View>
       {/* SCROLLING CONTAINER FOR MUSIC PLAYER (currently sandbox for testing) */}
       <ScrollView>
-        <Text>Tally is {tally}</Text>
         <Button
           id="Move Camera"
           color="orchid"
           title="Next Location"
-          onPress={() => handleMoveCamera(location)} //* Now animates to next location
+          onPress={() => nextLocation()} //* Now animates to next location
         />
         <Text>Current track ~ {currentTrack ? currentTrack.name : ''}</Text>
         <Text>Wandrer (proto)</Text>

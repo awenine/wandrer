@@ -112,6 +112,7 @@ const HistoryList = ({ navigation, drawHistory }) => {
       data={drawHistory}
       keyExtractor={(item) => item.datePlayed + ''} // NOTE: id expects string, must be unique
       renderItem={({ item, index }) => (
+        //todo Style this as link, favourites?
         <View>
           <Text>{item.name}</Text>
           <Text>By {item.username}</Text>
