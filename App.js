@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 /* eslint-disable prettier/prettier */
 import { StatusBar } from 'expo-status-bar';
 import { View, Dimensions, Text, FlatList } from 'react-native';
@@ -60,20 +61,6 @@ export default function App() {
       <Drawer.Navigator
         // drawerContent is callback passed props (not needed) & returning component
         drawerContent={(props) => (
-          // <FlatList
-          //   data={drawHistory}
-          //   keyExtractor={(item) => item.datePlayed + ''} // NOTE: id expects string, must be unique
-          //   renderItem={({ item, index }) => (
-          //     <View>
-          //       <Text>{item.name}</Text>
-          //       <Text>By {item.username}</Text>
-          //       <Text>
-          //         played on {new Date(item.datePlayed).toLocaleString('en-GB')}
-          //       </Text>
-          //       <Text>~~~</Text>
-          //     </View>
-          //   )}
-          // />
           <HistoryList drawHistory={drawHistory} {...props} />
         )}
         initialRouteName="Main"
@@ -107,21 +94,24 @@ const HistoryList = ({ navigation, drawHistory }) => {
   }, [isDrawerOpen]);
 
   return (
-    <FlatList 
-      // style={styles.flatlist}
-      data={drawHistory}
-      keyExtractor={(item) => item.datePlayed + ''} // NOTE: id expects string, must be unique
-      renderItem={({ item, index }) => (
-        //todo Style this as link, favourites?
-        <View>
-          <Text>{item.name}</Text>
-          <Text>By {item.username}</Text>
-          <Text>
-            played on {new Date(item.datePlayed).toLocaleString('en-GB')}
-          </Text>
-          <Text>~~~</Text>
-        </View>
-      )}
-    />
+    <View>
+      <Text style={{marginTop:30, marginBottom:10, fontSize:25, fontWeight: 'bold', color: 'whitesmoke'}}>V I S I T E D</Text>
+      <FlatList
+        data={drawHistory}
+        keyExtractor={(item) => item.datePlayed + ''} // NOTE: id expects string, must be unique
+        renderItem={({ item, index }) => (
+          <View>
+            <Text style={{fontWeight: 'bold'}}>{item.name}</Text>
+            <Text>By {item.username}</Text>
+            <Text>
+              played on {new Date(item.datePlayed).toLocaleString('en-GB')}
+            </Text>
+            <Text style={{fontWeight: 'bold'}}>Description:</Text>
+            <Text style={{color: '#dfe1f0'}}>{item.description}</Text>
+            <Text>~~~</Text>
+          </View>
+        )}
+      />
+    </View>
   );
 };

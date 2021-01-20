@@ -369,7 +369,7 @@ const Main = () => {
         <Text> </Text>
         <Button
           style={styles.search}
-          color="#6ca9ff"
+          color="#f0a82b"
           title="SEARCH FOR NEW SOUNDS"
           onPress={() => handleFetchAPI(100)} // 100 is the default search radius
         />
