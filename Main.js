@@ -27,14 +27,14 @@ const Main = () => {
   const [sound, setSound] = useState(null);
   const [location, setLocation] = useState({
     // default if location not yet loaded...
-    latitude: 37.78825,
-    longitude: -122.4324,
+    latitude: 51.370593,
+    longitude: -0.116573,
   });
   const [errorMsg, setErrorMsg] = useState(null); //! not using currently
   const [soundLoadMsg, setSoundLoadMsg] = useState('Waiting to play...');
   const [markerCoord, setMarkerCoord] = useState({
-    latitude: 37.78825,
-    longitude: -122.4324,
+    latitude: 51.370593,
+    longitude: -0.116573,
   });
 
   const [mapTrail, setMapTrail] = useState([]);
@@ -48,6 +48,8 @@ const Main = () => {
 
   //? tally for storing & retrieving history
   const [tally, setTally] = useState(0);
+
+  const [currentMessage, setCurrentMessage] = useState('Waiting for sounds...');
 
   //? fetch data from api
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -71,7 +73,9 @@ const Main = () => {
         handleFetchAPI(radius * 5); // increase radius of search
       } else {
         await setPlaylist(fetchedPlaylist.results);
-        console.log('New Playlist loaded,', fetchedPlaylist.count, 'items');
+        setCurrentMessage(
+          'Found ' + fetchedPlaylist.count + ' items within ' + radius + 'km',
+        );
       }
     }
   });
@@ -346,11 +350,11 @@ const Main = () => {
           <TouchableOpacity onPress={stopSound}>
             <SvgStopButton height="50" width="50" />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => handlePlayButton(currentTrack)}>
-            <SvgPlayButton height="50" width="50" />
-          </TouchableOpacity>
           <TouchableOpacity onPress={() => nextLocation()}>
             <SvgSkipButton height="50" width="50" />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handlePlayButton(currentTrack)}>
+            <SvgPlayButton height="50" width="50" />
           </TouchableOpacity>
         </View>
         <View style={styles.trackinfo}>
@@ -365,6 +369,7 @@ const Main = () => {
           <Text style={styles.coordinates}>
             {currentTrack ? '( ' + currentTrack.geotag + ' )' : ''}
           </Text>
+          <Text>{currentMessage}</Text>
         </View>
         <Text> </Text>
         <Button
