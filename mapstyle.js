@@ -75,7 +75,7 @@ const mapStyle = [
     "elementType": "geometry",
     "stylers": [
       {
-        "color": "#f3f49f"
+        "color": "#d5d482"
       }
     ]
   },
@@ -83,7 +83,7 @@ const mapStyle = [
     "featureType": "landscape.natural.terrain",
     "stylers": [
       {
-        "color": "#e3a67d"
+        "color": "#ea825e"
       }
     ]
   },
@@ -277,7 +277,7 @@ const mapStyle = [
     "featureType": "water",
     "stylers": [
       {
-        "color": "#75a7db"
+        "color": "#78a084"
       }
     ]
   },
@@ -286,7 +286,7 @@ const mapStyle = [
     "elementType": "geometry.fill",
     "stylers": [
       {
-        "color": "#99d6a5"
+        "color": "#78a084"
       }
     ]
   },
@@ -295,7 +295,7 @@ const mapStyle = [
     "elementType": "labels.text.fill",
     "stylers": [
       {
-        "color": "#92998d"
+        "color": "#78a084"
       }
     ]
   }

@@ -79,10 +79,10 @@ export default function App() {
         initialRouteName="Main"
         edgeWidth={Dimensions.get('window').width * 0.2}
         drawerStyle={{
-          backgroundColor: 'rgba(193, 66, 66, 0.72)', // colour of drawer w/ alpha
+          backgroundColor: 'rgba(170, 111, 75, 0.85)', // colour of drawer w/ alpha
           width: Dimensions.get('screen').width * 0.55,
         }}
-        overlayColor="rgba(40, 89, 127, 0.48)" // colour of transparency w/ alpha
+        overlayColor="rgba(118, 129, 182, 0.4)" // colour of transparency w/ alpha
       >
         <Drawer.Screen name="Main" component={Main} />
       </Drawer.Navigator>

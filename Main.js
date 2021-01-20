@@ -18,6 +18,10 @@ import mapStyle from './mapstyle';
 import APIsounds from './mockAPI';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import TOKEN from './mockEnv';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import SvgPlayButton from './assets/icons/PlayButton';
+import SvgStopButton from './assets/icons/StopButton';
+import SvgSkipButton from './assets/icons/SkipButton';
 
 const Main = () => {
   const [sound, setSound] = useState(null);
@@ -66,7 +70,8 @@ const Main = () => {
         //* ie no songs within range
         handleFetchAPI(radius * 5); // increase radius of search
       } else {
-        setPlaylist(fetchedPlaylist.results);
+        await setPlaylist(fetchedPlaylist.results);
+        nextLocation();
         console.log('New Playlist loaded,', fetchedPlaylist.count, 'items');
       }
     }
@@ -144,13 +149,6 @@ const Main = () => {
     loadTallyFromStorage();
   }, []);
 
-  function handleMarkerDrag(e) {
-    const newCoords = e.nativeEvent.coordinate; // change to given coordingates
-    setMarkerCoord(newCoords);
-    //? draw "trail" on map recording movement history of the marker & mapping to Polyline component
-    setMapTrail([...mapTrail, newCoords]);
-  }
-
   function handleMapPress(e) {
     setLocation(e.nativeEvent.coordinate);
   }
@@ -173,22 +171,6 @@ const Main = () => {
     );
   }
 
-  //? used to conditionally render items from fetched array
-  //todo replace with sounds from Freesound API
-  // function renderOnePost({ item, index }, number) {
-  //   if (index === number) {
-  //     return (
-  //       <View>
-  //         <Text>{item.title}</Text>
-  //         <Text></Text>
-  //       </View>
-  //     );
-  //   } else {
-  //     return;
-  //   }
-  // }
-
-  //todo how to best create unique id for each item saved? id_date?
   //? use to save to storage
   async function saveToStorage(key, item) {
     const trackJSON = JSON.stringify(item);
@@ -278,6 +260,7 @@ const Main = () => {
       // } else {
       playSound(track);
     } else {
+      handleFetchAPI(100);
       console.log('No track loaded');
       // nextLocation()
     }
@@ -329,12 +312,16 @@ const Main = () => {
     <View style={styles.container}>
       {/* MAP */}
       <View>
+        {/* <View styles={styles.banner}>
+          <Text style={styles.logo}>W A N D R E R</Text>
+        </View> */}
         <LinearGradient
           id="swipeArea"
-          colors={['rgba(0,0,0,0.4)', 'rgba(0,0,0,0.1)', 'transparent']}
+          colors={['rgba(19, 52, 26,1)', 'rgba(19, 52, 26,0.1)', 'transparent']}
           start={[0, 0.5]}
           end={[1, 0.5]}
-          style={styles.thumbBar}/>
+          style={styles.thumbBar}
+        />
         <MapView
           ref={mapView}
           style={styles.map}
@@ -354,57 +341,48 @@ const Main = () => {
               latitude: markerCoord.latitude,
               longitude: markerCoord.longitude,
             }}
-            // onDragEnd={handleMarkerDrag} // needs to be called on play of tracks (sets next polyline coord)
+            pinColor={'#6ca9ff'}
           />
-          <Polyline coordinates={mapTrail} />
+          <Polyline
+            coordinates={mapTrail}
+            strokeColor={'#30f797'}
+            strokeWidth={3}
+          />
         </MapView>
       </View>
       {/* SCROLLING CONTAINER FOR MUSIC PLAYER (currently sandbox for testing) */}
-      <ScrollView>
-        <Button
-          id="Move Camera"
-          color="orchid"
-          title="Next Location"
-          onPress={() => nextLocation()} //* Now animates to next location
-        />
-        <Text>Current track ~ {currentTrack ? currentTrack.name : ''}</Text>
+      <View>
+        <View style={styles.divider} />
+        <View style={styles.buttons}>
+          <TouchableOpacity onPress={stopSound}>
+            <SvgStopButton height="50" width="50" />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handlePlayButton(currentTrack)}>
+            <SvgPlayButton height="50" width="50" />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => nextLocation()}>
+            <SvgSkipButton height="50" width="50" />
+          </TouchableOpacity>
+        </View>
+        <Text>
+          {currentTrack ? 'Current track ~ ' + currentTrack.name : 'Wander...'}
+        </Text>
         <Text>Wandrer (proto)</Text>
         <Text style={styles.subtitle}>made using Freesound</Text>
         <Text style={styles.soundload}>{soundLoadMsg}</Text>
-        <View style={styles.buttons}>
-          <Button
-            color="darkseagreen"
-            title="Play"
-            onPress={() => handlePlayButton(currentTrack)}
-          />
-          <Text>{'         '}</Text>
-          <Button color="maroon" title="Stop" onPress={stopSound} />
-          <Text>{'         '}</Text>
-          <Button color="peru" title="Log" onPress={consoleLogger} />
-          <Text>{'         '}</Text>
-          <Button
-            color="blue"
-            title="API"
-            onPress={() => handleFetchAPI(100)} // 100 is the default search radius
-          />
-        </View>
         <Text>{''}</Text>
-        {/* Get and print coordinates of marker when moved */}
         <Text>
           Marker at: {markerCoord.latitude}, {markerCoord.longitude}
         </Text>
-        {/* <FlatList
-          style={styles.flatlist}
-          data={postsFromAPI}
-          keyExtractor={(item) => item.id + ''} // NOTE: id expects string
-          renderItem={({ item, index }) =>
-            renderOnePost({ item, index }, randNum)
-          }
-        /> */}
         <Text>{''}</Text>
         <Text>Current tally in local storage: {quote}</Text>
-        <StatusBar style="auto" />
-      </ScrollView>
+        <Button
+          style={styles.search}
+          color="#6ca9ff"
+          title="SEARCH FOR NEW SOUNDS"
+          onPress={() => handleFetchAPI(100)} // 100 is the default search radius
+        />
+      </View>
     </View>
   );
 };
@@ -412,7 +390,7 @@ const Main = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'darkkhaki',
+    backgroundColor: '#6c6b83',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -425,11 +403,18 @@ const styles = StyleSheet.create({
   },
   buttons: {
     flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-evenly',
+    marginTop: 5,
   },
   map: {
     width: Dimensions.get('window').width,
-    height: Dimensions.get('window').height * 0.7,
-    marginBottom: 10,
+    height: Dimensions.get('window').height * 0.66,
+  },
+  divider: {
+    width: Dimensions.get('window').width,
+    height: 2,
+    backgroundColor: '#b6b6d8',
   },
   flatlist: {
     height: Dimensions.get('window').height * 0.2,
@@ -448,9 +433,26 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(40, 89, 127, 0)',
     top: 0,
     left: 0,
-    height: Dimensions.get('window').height * 0.7,
+    height: Dimensions.get('window').height * 0.66,
     width: Dimensions.get('window').width * 0.08,
     zIndex: 100,
+  },
+  logo: {
+    position: 'absolute',
+    backgroundColor: 'rgba(0, 0, 0, 0)',
+    height: Dimensions.get('window').height * 0.7,
+    width: Dimensions.get('window').width,
+    zIndex: 100,
+  },
+  banner: {
+    position: 'absolute',
+    backgroundColor: 'rgba(0, 0, 0, 0)',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-evenly',
+    marginTop: 25,
+    width: Dimensions.get('window').width,
+    zIndex: 110,
   },
 });
 
