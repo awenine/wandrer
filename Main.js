@@ -71,7 +71,6 @@ const Main = () => {
         handleFetchAPI(radius * 5); // increase radius of search
       } else {
         await setPlaylist(fetchedPlaylist.results);
-        nextLocation();
         console.log('New Playlist loaded,', fetchedPlaylist.count, 'items');
       }
     }
@@ -108,7 +107,6 @@ const Main = () => {
     }
   }
 
-  //todo look at when unloading comes into effect
   useEffect(() => {
     //* sets audio to continue playing when app is in background
     Audio.setAudioModeAsync({
@@ -252,17 +250,10 @@ const Main = () => {
 
   function handlePlayButton(track) {
     if (track) {
-      // let newCoords = currentTrack.geotag.split(' ').map((coord) => +coord);
-      // if (markerCoord !== { latitude: newCoords[0], longitude: newCoords[1] }) {
-      //   console.log('different places or no track loaded');
-      //   console.log("markerCoord: ",markerCoord);
-      //   console.log("newCoords: ",newCoords);
-      // } else {
       playSound(track);
     } else {
       handleFetchAPI(100);
       console.log('No track loaded');
-      // nextLocation()
     }
   }
 
@@ -273,12 +264,12 @@ const Main = () => {
     saveToStorage(key, item);
   }
 
-  function consoleLogger() {
-    console.log('tally = ', tally);
-    // clearStorage();
-    // loadTallyFromStorage();
-    // getAllKeys();
-  }
+  // function consoleLogger() {
+  //   console.log('tally = ', tally);
+  //  clearStorage();
+  //  loadTallyFromStorage();
+  //  getAllKeys();
+  // }
 
   //? clears local storage of all tracks and tally (FOR RESET)
   // const clearStorage = async () => {
@@ -326,14 +317,12 @@ const Main = () => {
           ref={mapView}
           style={styles.map}
           initialRegion={{
-            //* keep as initial region and look at how updated
             ...location,
             latitudeDelta: 0.15,
             longitudeDelta: 0.15,
           }}
           // accesses seperate mapstyle.js file for customising the maps appearance
           customMapStyle={mapStyle}
-          // showsUserLocation-true // NOTE - fails silently, other dependencies
           onPress={handleMapPress}
         >
           <Marker
@@ -350,8 +339,8 @@ const Main = () => {
           />
         </MapView>
       </View>
-      {/* SCROLLING CONTAINER FOR MUSIC PLAYER (currently sandbox for testing) */}
-      <View>
+      {/* MUSIC PLAYER */}
+      <View style={styles.player}>
         <View style={styles.divider} />
         <View style={styles.buttons}>
           <TouchableOpacity onPress={stopSound}>
@@ -364,18 +353,20 @@ const Main = () => {
             <SvgSkipButton height="50" width="50" />
           </TouchableOpacity>
         </View>
-        <Text>
-          {currentTrack ? 'Current track ~ ' + currentTrack.name : 'Wander...'}
-        </Text>
-        <Text>Wandrer (proto)</Text>
-        <Text style={styles.subtitle}>made using Freesound</Text>
-        <Text style={styles.soundload}>{soundLoadMsg}</Text>
-        <Text>{''}</Text>
-        <Text>
-          Marker at: {markerCoord.latitude}, {markerCoord.longitude}
-        </Text>
-        <Text>{''}</Text>
-        <Text>Current tally in local storage: {quote}</Text>
+        <View style={styles.trackinfo}>
+          <Text style={styles.track}>
+            {currentTrack
+              ? 'Current track ~ ' + currentTrack.name
+              : 'Wander...'}
+          </Text>
+          <Text style={styles.user}>
+            {currentTrack ? 'by ' + currentTrack.username : ''}
+          </Text>
+          <Text style={styles.coordinates}>
+            {currentTrack ? '( ' + currentTrack.geotag + ' )' : ''}
+          </Text>
+        </View>
+        <Text> </Text>
         <Button
           style={styles.search}
           color="#6ca9ff"
@@ -393,6 +384,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#6c6b83',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  trackinfo: {
+    alignItems: 'center',
   },
   subtitle: {
     color: 'teal',
@@ -415,6 +409,7 @@ const styles = StyleSheet.create({
     width: Dimensions.get('window').width,
     height: 2,
     backgroundColor: '#b6b6d8',
+    marginBottom: 10,
   },
   flatlist: {
     height: Dimensions.get('window').height * 0.2,
@@ -427,14 +422,13 @@ const styles = StyleSheet.create({
     backgroundColor: 'antiquewhite',
     marginVertical: 5,
   },
-  // replace below with subtle fade to indicate presence of drawer
   thumbBar: {
     position: 'absolute',
     backgroundColor: 'rgba(40, 89, 127, 0)',
     top: 0,
     left: 0,
     height: Dimensions.get('window').height * 0.66,
-    width: Dimensions.get('window').width * 0.08,
+    width: Dimensions.get('window').width * 0.12,
     zIndex: 100,
   },
   logo: {
@@ -453,6 +447,16 @@ const styles = StyleSheet.create({
     marginTop: 25,
     width: Dimensions.get('window').width,
     zIndex: 110,
+  },
+  track: {
+    color: '#e8e8f4',
+    fontWeight: 'bold',
+  },
+  user: {
+    color: '#e8e8f4',
+  },
+  coordinates: {
+    color: '#7681b6',
   },
 });
 
