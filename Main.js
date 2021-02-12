@@ -1,4 +1,3 @@
-import { StatusBar } from 'expo-status-bar';
 import {
   Platform,
   StyleSheet,
@@ -6,7 +5,6 @@ import {
   View,
   Button,
   Dimensions,
-  ScrollView,
 } from 'react-native';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Constants from 'expo-constants';
@@ -26,32 +24,24 @@ import SvgSkipButton from './assets/icons/SkipButton';
 const Main = () => {
   const [sound, setSound] = useState(null);
   const [location, setLocation] = useState({
-    // default if location not yet loaded...
     latitude: 51.370593,
     longitude: -0.116573,
   });
-  const [errorMsg, setErrorMsg] = useState(null); //! not using currently
+  const [errorMsg, setErrorMsg] = useState(null);
   const [soundLoadMsg, setSoundLoadMsg] = useState('Waiting to play...');
   const [markerCoord, setMarkerCoord] = useState({
     latitude: 51.370593,
     longitude: -0.116573,
   });
-
   const [mapTrail, setMapTrail] = useState([]);
-  //? Quote to store locally
   const [quote, setQuote] = useState();
 
-  //? current tracks cued (defaults to mock API)
   const [playlist, setPlaylist] = useState(APIsounds.results);
-  //? current song/track
   const [currentTrack, setCurrentTrack] = useState(null);
-
-  //? tally for storing & retrieving history
   const [tally, setTally] = useState(0);
 
   const [currentMessage, setCurrentMessage] = useState('Waiting for sounds...');
 
-  //? fetch data from api
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleFetchAPI = useCallback(async (radius) => {
     console.log('handling fetch...');
@@ -80,25 +70,22 @@ const Main = () => {
     }
   });
 
-  //? used to access methods on the MapView component (for animation)
+  // used to access methods on the MapView component (for viewport animation)
   const mapView = useRef(null);
 
-  //* sound continues to play in background but no lockscreen solution found
+  //TODO implement lockscreen solution to allow pause and resumption of tracks as they are played in background when app isnt active
   async function playSound(soundLink) {
     setSoundLoadMsg('Loading Sound');
-    const { sound } = await Audio.Sound.createAsync(
-      //* for playing sounds from URL (below route returned by freesound api > 'previews')
-      { uri: soundLink.previews['preview-lq-mp3'] },
-    );
+    const { sound } = await Audio.Sound.createAsync({
+      uri: soundLink.previews['preview-lq-mp3'],
+    });
     sound.setOnPlaybackStatusUpdate(_onPlaybackStatusUpdate);
     setSound(sound);
     await sound.playAsync();
     setSoundLoadMsg('Playing Sound');
   }
-  //? fires on current track ending, autoplaying next track
   function _onPlaybackStatusUpdate(playbackStatus) {
     if (playbackStatus.didJustFinish) {
-      // The player has just finished playing and will stop.
       console.log('***NEXT TRACK***');
       nextLocation();
     }
@@ -112,7 +99,6 @@ const Main = () => {
   }
 
   useEffect(() => {
-    //* sets audio to continue playing when app is in background
     Audio.setAudioModeAsync({
       staysActiveInBackground: true,
     });
@@ -124,30 +110,25 @@ const Main = () => {
       : undefined;
   }, [sound]);
 
-  //? Location settup
   useEffect(() => {
     (async () => {
-      //* check whether app is running on phone or emulator
       if (Platform.OS === 'android' && !Constants.isDevice) {
         setErrorMsg(
           'Sorry, geolocation will not work in an Android emulator. Try it on your device!',
         );
         return;
       }
-      //* set error message and return if permission denied
       let { status } = await Location.requestPermissionsAsync();
       if (status !== 'granted') {
         setErrorMsg('Sorry, permission to access location was denied');
         return;
       }
-      //* fetch location
       let result = await Location.getLastKnownPositionAsync({});
       if (result) {
         let { longitude, latitude } = result.coords;
         setLocation({ longitude, latitude });
       }
     })();
-    // update current tally of stored items
     loadTallyFromStorage();
   }, []);
 
@@ -155,7 +136,6 @@ const Main = () => {
     setLocation(e.nativeEvent.coordinate);
   }
 
-  //? run whenever location changes
   useEffect(() => {
     mapAnimateNavigation(location);
     setMarkerCoord(location);
@@ -173,7 +153,6 @@ const Main = () => {
     );
   }
 
-  //? use to save to storage
   async function saveToStorage(key, item) {
     const trackJSON = JSON.stringify(item);
     try {
@@ -184,13 +163,11 @@ const Main = () => {
     }
   }
 
-  //? Load from localstorage when tally updated
   async function loadTallyFromStorage() {
     try {
       const itemsInHistory = await AsyncStorage.getItem('storedTally');
       if (itemsInHistory) {
         setTally(JSON.parse(itemsInHistory));
-        // setTally(0); // used for hard reset of local storage
       }
       console.log('Tally set from storage to', itemsInHistory);
     } catch (error) {
@@ -199,7 +176,6 @@ const Main = () => {
     }
   }
 
-  //? Load tally from localstorage on startup
   async function loadFromStorage() {
     try {
       const trackJSON = await AsyncStorage.getItem(tally.toString());
@@ -225,19 +201,15 @@ const Main = () => {
       setCurrentTrack(playlist[trackNum]);
       setPlaylist(playlist.filter((_, i) => i !== trackNum));
       setTally((currentTally) => currentTally + 1);
-      //* tally triggers useEffect with other functions to maintain execution order
     }
   }
 
   useEffect(() => {
     if (currentTrack !== null) {
-      // format coordinates
       let newCoords = currentTrack.geotag.split(' ').map((coord) => +coord);
       const newCoordObj = { latitude: newCoords[0], longitude: newCoords[1] };
-      // set new location
       setLocation(newCoordObj);
       setMapTrail([...mapTrail, newCoordObj]);
-      // autoplay next track
       playSound(currentTrack);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -268,48 +240,9 @@ const Main = () => {
     saveToStorage(key, item);
   }
 
-  // function consoleLogger() {
-  //   console.log('tally = ', tally);
-  //  clearStorage();
-  //  loadTallyFromStorage();
-  //  getAllKeys();
-  // }
-
-  //? clears local storage of all tracks and tally (FOR RESET)
-  // const clearStorage = async () => {
-  //   console.log('tally in clearStorage: ', tally);
-  //   const slots = [...Array(tally)].map((_, i) => (i + 1).toString());
-  //   console.log('slots: ', slots);
-  //   const keys = [...slots, 'storedTally'];
-  //   console.log('keys: ', keys);
-  //   try {
-  //     await AsyncStorage.multiRemove(keys)
-  //   } catch (e) {
-  //     // remove error
-  //   }
-  //   console.log('Storage cleared');
-  // };
-
-  //? retrieve keys in local storage (FOR RESET)
-  // const getAllKeys = async () => {
-  //   let keys = [];
-  //   try {
-  //     keys = await AsyncStorage.getAllKeys()
-  //   } catch (e) {
-  //     // read key error
-  //   }
-  //   console.log('keys: ', keys);
-  //   // example console.log result:
-  //   // ['@MyApp_user', '@MyApp_key']
-  // };
-
   return (
     <View style={styles.container}>
-      {/* MAP */}
       <View>
-        {/* <View styles={styles.banner}>
-          <Text style={styles.logo}>W A N D R E R</Text>
-        </View> */}
         <LinearGradient
           id="swipeArea"
           colors={['rgba(19, 52, 26,1)', 'rgba(19, 52, 26,0.1)', 'transparent']}
@@ -343,7 +276,6 @@ const Main = () => {
           />
         </MapView>
       </View>
-      {/* MUSIC PLAYER */}
       <View style={styles.player}>
         <View style={styles.divider} />
         <View style={styles.buttons}>
@@ -376,7 +308,7 @@ const Main = () => {
           style={styles.search}
           color="#f0a82b"
           title="SEARCH FOR NEW SOUNDS"
-          onPress={() => handleFetchAPI(100)} // 100 is the default search radius
+          onPress={() => handleFetchAPI(100)} // 100km is the default search radius
         />
       </View>
     </View>

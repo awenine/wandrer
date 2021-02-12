@@ -12,9 +12,6 @@ import Main from './Main.js';
 export default function App() {
   const Drawer = createDrawerNavigator();
 
-  // mock local storage
-  // const [mockStore, setMockStore] = useState([1, 2, 3, 4, 7, 1123]);
-
   const [drawTally, setDrawTally] = useState(0);
   const [drawHistory, setDrawHistory] = useState([]);
 
@@ -25,9 +22,7 @@ export default function App() {
   async function loadTallyFromStorage() {
     try {
       const itemsInHistory = await AsyncStorage.getItem('storedTally');
-      // if (itemsInHistory) {
         await setDrawTally(JSON.parse(itemsInHistory));
-      // }
       console.log('Tally Drawer set to', itemsInHistory);
     } catch (error) {
       // eslint-disable-next-line no-alert
@@ -51,25 +46,21 @@ export default function App() {
     }
   }
 
-  //todo use drawer as 'history' tab to show tracks that have been played
-  //todo set draw to swipe even when over map
-  //todo add visual cue (slight shadow?) where drawer can be swiped from
   return (
     <NavigationContainer
       onStateChange={(state) => loadTallyFromStorage()}
     > 
       <Drawer.Navigator
-        // drawerContent is callback passed props (not needed) & returning component
         drawerContent={(props) => (
           <HistoryList drawHistory={drawHistory} {...props} />
         )}
         initialRouteName="Main"
         edgeWidth={Dimensions.get('window').width * 0.2}
         drawerStyle={{
-          backgroundColor: 'rgba(170, 111, 75, 0.85)', // colour of drawer w/ alpha
+          backgroundColor: 'rgba(170, 111, 75, 0.85)',
           width: Dimensions.get('screen').width * 0.55,
         }}
-        overlayColor="rgba(118, 129, 182, 0.4)" // colour of transparency w/ alpha
+        overlayColor="rgba(118, 129, 182, 0.4)"
       >
         <Drawer.Screen name="Main" component={Main} />
       </Drawer.Navigator>
@@ -77,18 +68,15 @@ export default function App() {
   );
 }
 
-
 const HistoryList = ({ navigation, drawHistory }) => {
 
   const isDrawerOpen = useIsDrawerOpen();
-  // const isFocused = navigation.isFocused();
 
   useEffect(() => {
     console.log("isDrawerOpen: ",isDrawerOpen);
     (async () => {
       if (isDrawerOpen) {
         const itemsInHistory = await AsyncStorage.getItem('storedTally');
-        // console.log('Tally Drawer in HistoryList set to', itemsInHistory);
       }
     })();
   }, [isDrawerOpen]);
@@ -98,7 +86,7 @@ const HistoryList = ({ navigation, drawHistory }) => {
       <Text style={{marginTop:30, marginBottom:10, fontSize:25, fontWeight: 'bold', color: 'whitesmoke'}}>V I S I T E D</Text>
       <FlatList
         data={drawHistory}
-        keyExtractor={(item) => item.datePlayed + ''} // NOTE: id expects string, must be unique
+        keyExtractor={(item) => item.datePlayed + ''}
         renderItem={({ item, index }) => (
           <View>
             <Text style={{fontWeight: 'bold'}}>{item.name}</Text>
