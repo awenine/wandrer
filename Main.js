@@ -15,13 +15,13 @@ import MapView, { Marker, Polyline } from 'react-native-maps';
 import mapStyle from './mapstyle';
 import APIsounds from './mockAPI';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import TOKEN from './mockEnv';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import SvgPlayButton from './assets/icons/PlayButton';
 import SvgStopButton from './assets/icons/StopButton';
 import SvgSkipButton from './assets/icons/SkipButton';
 
 const Main = () => {
+  const TOKEN = process.env.TOKEN;
   const [sound, setSound] = useState(null);
   const [location, setLocation] = useState({
     latitude: 51.370593,

@@ -1,8 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 /* eslint-disable prettier/prettier */
-import { StatusBar } from 'expo-status-bar';
 import { View, Dimensions, Text, FlatList } from 'react-native';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { NavigationContainer } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -11,7 +10,6 @@ import Main from './Main.js';
 
 export default function App() {
   const Drawer = createDrawerNavigator();
-
   const [drawTally, setDrawTally] = useState(0);
   const [drawHistory, setDrawHistory] = useState([]);
 
@@ -23,7 +21,6 @@ export default function App() {
     try {
       const itemsInHistory = await AsyncStorage.getItem('storedTally');
         await setDrawTally(JSON.parse(itemsInHistory));
-      console.log('Tally Drawer set to', itemsInHistory);
     } catch (error) {
       // eslint-disable-next-line no-alert
       alert(error);
@@ -45,7 +42,6 @@ export default function App() {
       alert(error);
     }
   }
-
   return (
     <NavigationContainer
       onStateChange={(state) => loadTallyFromStorage()}
@@ -68,12 +64,12 @@ export default function App() {
   );
 }
 
-const HistoryList = ({ navigation, drawHistory }) => {
 
+const HistoryList = ({ navigation, drawHistory }) => {
   const isDrawerOpen = useIsDrawerOpen();
 
   useEffect(() => {
-    console.log("isDrawerOpen: ",isDrawerOpen);
+    console.log('isDrawerOpen: ',isDrawerOpen);
     (async () => {
       if (isDrawerOpen) {
         const itemsInHistory = await AsyncStorage.getItem('storedTally');
