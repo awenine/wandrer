@@ -61,7 +61,7 @@ All contributions are welcome :-)
 
 ## Author
 
-Christopher Owen - [Github](https://github.com/awenine)
+Christopher Owen - [Github](https://github.com/awenine) [LinkedIn](https://www.linkedin.com/in/awenine/)
 
 
 ## License
